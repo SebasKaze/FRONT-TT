@@ -1,2 +1,122 @@
 @import "tailwindcss";
 
+/* Contenedor Principal */
+.visor-pedimento {
+    background: #f8f9fa;
+    min-height: 100vh;
+    padding: 20px;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.header-bar {
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+.header-bar h2 { margin: 0; color: #333; }
+.highlight { color: #0056b3; font-weight: 800; }
+
+/* Navegación de Pestañas */
+.tabs-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.tabs-nav button {
+    padding: 12px 24px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: #6c757d;
+    transition: all 0.3s;
+    border-bottom: 3px solid transparent;
+}
+
+.tabs-nav button.active {
+    color: #0056b3;
+    border-bottom-color: #0056b3;
+}
+
+/* Contenido y Cards */
+.tab-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-left: 4px solid #e9ecef;
+}
+
+.label { font-size: 0.85rem; color: #6c757d; text-transform: uppercase; }
+.value { font-size: 1.1rem; font-weight: 600; color: #212529; }
+
+/* Tablas Modernas */
+.table-wrapper { overflow-x: auto; }
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.modern-table th {
+    background: #f1f3f5;
+    padding: 12px;
+    text-align: left;
+    font-size: 0.9rem;
+}
+
+.modern-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.text-right { text-align: right; }
+.font-mono { font-family: monospace; font-size: 1rem; }
+
+/* Acordeón de Partidas */
+.accordion-item {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.accordion-header {
+    background: #f8f9fa;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.badge {
+    background: #0056b3;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 10px;
+    font-size: 0.8rem;
+}
+
+.accordion-body {
+    padding: 20px;
+    background: #fff;
+    border-top: 1px solid #dee2e6;
+}

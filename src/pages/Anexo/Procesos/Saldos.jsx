@@ -9,6 +9,7 @@ function Saldos() {
 
     const [empresaSeleccionada, setEmpresaSeleccionada] = useState("");
     const [domicilioSeleccionado, setDomicilioSeleccionado] = useState("");
+    const [selector, setSelector] = useState("");
 
     const userData = JSON.parse(localStorage.getItem("userData")) || {};
     const { cuenta, id_empresa } = userData; 
@@ -58,28 +59,28 @@ function Saldos() {
     }, [empresaSeleccionada, backConection]);
 
     useEffect(() => {
-        if (empresaSeleccionada && domicilioSeleccionado) {
-            fetch(`${backConection}/api/procesos/saldoMuestra?id_empresa=${empresaSeleccionada}&id_domicilio=${domicilioSeleccionado}`)
+        if (empresaSeleccionada && domicilioSeleccionado && selector) {
+            fetch(
+                `${backConection}/api/procesos/saldoMuestra?id_empresa=${empresaSeleccionada}&id_domicilio=${domicilioSeleccionado}&selector=${selector}`
+            )
                 .then((response) => response.json())
                 .then((responseData) => {
-                    // Si es un array (caso exitoso), actualiza el estado
                     if (Array.isArray(responseData)) {
                         setActivos(responseData);
-                    } 
-                    // Si es un objeto con mensaje (caso sin datos), muestra un array vacío
-                    else if (responseData.mensaje) {
-                        console.log(responseData.mensaje); // Opcional: muestra el mensaje en consola
+                        setCurrentPage(1);
+                    } else if (responseData.mensaje) {
+                        console.log(responseData.mensaje);
                         setActivos([]);
-                    }
-                    // Otros casos (error inesperado)
-                    else {
+                    } else {
                         console.error("Respuesta inesperada:", responseData);
                         setActivos([]);
                     }
                 })
-                .catch((error) => console.error("Error al obtener los datos:", error));
+                .catch((error) =>
+                    console.error("Error al obtener los datos:", error)
+                );
         }
-    }, [empresaSeleccionada, domicilioSeleccionado]);
+    }, [empresaSeleccionada, domicilioSeleccionado, selector]);
 
     // =========================
     // CAMBIO EMPRESA
@@ -89,6 +90,7 @@ function Saldos() {
         setEmpresaSeleccionada(empresaId);
         setDomicilioSeleccionado("");
         setActivos([]);
+        setCurrentPage(1);
     };
 
     // =========================
@@ -96,6 +98,7 @@ function Saldos() {
     // =========================
     const handleDomicilioChange = (e) => {
         setDomicilioSeleccionado(e.target.value);
+        setCurrentPage(1);
     };
 
 
@@ -108,13 +111,22 @@ function Saldos() {
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-    const descargarExcel = () => {
-        if (!fechaInicio || !fechaFin) {
-            alert("Por favor, selecciona un rango de fechas.");
-            return;
-        }
-        window.open(`${backConection}/api/procesos/reporte/saldoE?id_empresa=${id_empresa}&id_domicilio=${id_domicilio}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`, "_blank");
-    };
+const descargarExcel = () => {
+    if (!domicilioSeleccionado) {
+        alert("Selecciona un domicilio.");
+        return;
+    }
+
+    if (!selector) {
+        alert("Selecciona un tipo de saldo.");
+        return;
+    }
+
+    window.open(
+        `${backConection}/api/procesos/reporte/saldoE?id_empresa=${empresaSeleccionada}&id_domicilio=${domicilioSeleccionado}&selector=${selector}`,
+        "_blank"
+    );
+};
 
     return (
         <div className="max-w-6xl mx-auto bg-gray-100 p-5 rounded-xl">
@@ -174,7 +186,22 @@ function Saldos() {
                             ))}
                         </select>
                     </div>
+
                 </div>
+
+                <div className="mb-6">
+                    <label className="block mb-2 font-semibold">Tipo de saldo</label>
+                    <select
+                        value={selector}
+                        onChange={(e) => setSelector(e.target.value)}
+                        className="w-full border rounded-md p-2"
+                    >
+                        <option value="1">Sin utilizar</option>
+                        <option value="2">Agotado</option>
+                        <option value="3">Saldo restante</option>
+                    </select>
+                </div>
+
             </div>
 
             <h2 className="text-3xl font-bold text-gray-900 mb-6 p-6">Saldo</h2>
@@ -195,13 +222,18 @@ function Saldos() {
                 className="border  p-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             <div className="border border-gray-300 shadow-lg bg-white">
-                
                 <table className="w-full">
                     <thead className="bg-gray-200">
                         <tr>
                             <th className="border p-2">No. Pedimento</th>
                             <th className="border p-2">Fracción</th>
-                            <th className="border p-2">Resta más antigua</th>
+                            <th className="border p-2">
+                                {selector === "1"
+                                    ? "Cantidad total"
+                                    : selector === "2"
+                                    ? "Estado"
+                                    : "Cantidad restante"}
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -209,7 +241,13 @@ function Saldos() {
                             <tr key={index} className="text-center">
                                 <td className="border p-2">{row.no_pedimento}</td>
                                 <td className="border p-2">{row.fraccion}</td>
-                                <td className="border p-2">{row.resta}</td>
+                                <td className="border p-2">
+                                    {selector === "1"
+                                        ? row.cantidad_total
+                                        : selector === "2"
+                                        ? "Agotado"
+                                        : row.cantidad_restante}
+                                </td>
                             </tr>
                         ))}
                     </tbody>

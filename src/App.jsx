@@ -16,7 +16,7 @@ import Dashboard from "./pages/Dashboard"
 //IMPORTS PAGINAS
 //Pedimentos
 import Pedimento from "./pages/Anexo/Pedimento/Pedimentos"
-//import PedimentoVer from "./pages/Anexo/Pedimento/PedimentoVer"
+import PedimentoVer from "./pages/Anexo/Pedimento/PedimentoVer"
 //import PedimentoEditar from "./pages/Anexo/Pedimento/PedimentoEditar"
 
 //Procesos
@@ -24,7 +24,7 @@ import EntradaMercancia from "./pages/Anexo/Procesos/EntradaMercancia"
 import SalidaMercancia from "./pages/Anexo/Procesos/SalidaMercancia"
 import Saldo from "./pages/Anexo/Procesos/Saldos"
 import MaterialUtilizado from "./pages/Anexo/Procesos/MaterialesUtilizados"
-import MaterialesUtilizadosCP from "./pages/Anexo/Procesos/MaterialUtilizadoCP"
+
 
 //Catalogos
 import Productos from "./pages/Anexo/Catalogos/Productos"
@@ -66,6 +66,7 @@ function App() {
           <Route path="/" element={<Home />} />
           {/* Pedimentos */}
           <Route path="/pedimento" element={<PrivateRoute> <Pedimento /> </PrivateRoute>}/>
+          <Route path="/pedimentos/ver/:id" element={<PrivateRoute> <PedimentoVer /> </PrivateRoute>}/>
           {/* Catalogos */}
           <Route path="/productos" element={<Productos />}/>
           <Route path="/materiales" element={<Materiales />}/>
@@ -76,7 +77,6 @@ function App() {
           <Route path="/salida_mercancia" element={<SalidaMercancia />}/>
           <Route path="/saldo" element={<Saldo />}/>
           <Route path="/materiales_utilizados" element={<MaterialUtilizado />}/>
-          <Route path="/materiales_utilizadoscp" element={<MaterialesUtilizadosCP />}/>
           {/* Activo Fijo */}
           <Route path="/activofijo" element={<ActivoFijo />}/>
           <Route path="/activofijocrear" element={<ActivoFijoCrear />}/>

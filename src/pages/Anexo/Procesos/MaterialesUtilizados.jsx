@@ -67,16 +67,33 @@ function MaterialesUtilizados() {
 
     useEffect(() => {
         if (empresaSeleccionada && domicilioSeleccionado) {
-            fetch(`${backConection}/api/procesos/mateutili?id_empresa=${empresaSeleccionada}&id_domicilio=${domicilioSeleccionado}`)
+            fetch(
+                `${backConection}/api/procesos/mateutili?id_empresa=${empresaSeleccionada}&id_domicilio=${domicilioSeleccionado}`
+            )
                 .then((response) => response.json())
-                .then((data) => {
-                    const formattedData = data.map(row => ({
-                        ...row,
-                        fecha_transformacion: new Date(row.fecha_transformacion).toISOString().split('T')[0]
-                    }));
-                    setData(formattedData);
+                .then((responseData) => {
+                    if (Array.isArray(responseData)) {
+                        const formattedData = responseData.map((row) => ({
+                            ...row,
+                            fecha_transformacion: row.fecha_transformacion
+                                ? new Date(row.fecha_transformacion)
+                                        .toISOString()
+                                        .split("T")[0]
+                                : "",
+                        }));
+
+                        setData(formattedData);
+                        setCurrentPage(1);
+                    } else if (responseData.mensaje) {
+                        setData([]);
+                    } else {
+                        console.error("Respuesta inesperada:", responseData);
+                        setData([]);
+                    }
                 })
-                .catch((error) => console.error("Error al obtener los datos:", error));
+                .catch((error) =>
+                    console.error("Error al obtener los datos:", error)
+                );
         }
     }, [empresaSeleccionada, domicilioSeleccionado]);
 
@@ -100,17 +117,19 @@ function MaterialesUtilizados() {
 
     const materialUtilizadoVer = async (id_transformacion) => {
         try {
-            const response = await fetch(`${backConection}/api/procesos/mateutili/vermateuti?id_transformacion=${id_transformacion}`);
-            const data = await response.json();
-            setModalData(data);
-            setIsModalOjo(true);
-        } catch (error) {
-            console.error("Error al obtener las fracciones:", error);
-        }
-    };
+            const response = await fetch(
+                `${backConection}/api/procesos/mateutili/cargamateriales?id_transformacion=${id_transformacion}`
+            );
 
-    const handleNuevoMaterial = () => {
-        navigate("/materiales_utilizadoscp");
+            const responseData = await response.json();
+
+            setModalData(Array.isArray(responseData) ? responseData : []);
+            setIsModalOjo(true);
+
+        } catch (error) {
+            console.error("Error al obtener materiales:", error);
+            setModalData([]);
+        }
     };
 
     const handleEdit = (id) => {
@@ -127,7 +146,7 @@ function MaterialesUtilizados() {
             alert("Por favor, selecciona un rango de fechas.");
             return;
         }
-        window.open(`${backConection}/api/procesos/reporte/materialUE?id_empresa=${id_empresa}&id_domicilio=${id_domicilio}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`, "_blank");
+        window.open(`${backConection}/api/procesos/reporte/materialUE?id_empresa=${empresaSeleccionada}&id_domicilio=${domicilioSeleccionado}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`, "_blank");
     };
 
 
@@ -192,14 +211,6 @@ function MaterialesUtilizados() {
             </div>
 
             <div className="w-full mb-4">
-                {LimitadorBoton &&(
-                    <button 
-                        className="btn-crud mr-4" 
-                        onClick={handleNuevoMaterial}>
-                        Carga de Productos <FaPlus />
-                    </button>
-                )}
-
                 <button
                     onClick={() => setIsModalReporte(true)} 
                     className="px-4 py-4 bg-blue-500 text-white rounded hover:bg-blue-700 transition">
@@ -211,7 +222,11 @@ function MaterialesUtilizados() {
                 <table className="w-full">
                     <thead className="bg-gray-200">
                         <tr>
+                            <th className="border p-2">Pedimento</th>
+                            <th className="border p-2">ID Interno</th>
                             <th className="border p-2">Producto</th>
+                            <th className="border p-2">Fracción</th>
+                            <th className="border p-2">Sec</th>
                             <th className="border p-2">Cantidad creada</th>
                             <th className="border p-2">Fecha</th>
                             <th className="border p-2">Acciones</th>
@@ -220,12 +235,20 @@ function MaterialesUtilizados() {
                     <tbody>
                         {paginatedData.map((row, index) => (
                             <tr key={index} className="text-center">
-                                <td className="border p-2">{row.nombre}</td>
+                                <td className="border p-2">{row.no_pedimento}</td>
+                                <td className="border p-2">{row.id_producto_interno}</td>
+                                <td className="border p-2">{row.nombre_interno}</td>
+                                <td className="border p-2">{row.fraccion_arancelaria}</td>
+                                <td className="border p-2">{row.sec_partida}</td>
                                 <td className="border p-2">{row.cantidad}</td>
                                 <td className="border p-2">{row.fecha_transformacion}</td>
-                                <td className="border p-2 flex justify-center gap-2">
-                                    <button className="text-blue-500 hover:text-blue-800"
-                                    onClick={() => materialUtilizadoVer(row.id_transformacion)}>
+                                <td className="border p-2">
+                                    <button
+                                        className="text-blue-500 hover:text-blue-800"
+                                        onClick={() =>
+                                            materialUtilizadoVer(row.id_transformacion)
+                                        }
+                                    >
                                         <FaEye />
                                     </button>
                                 </td>
@@ -233,8 +256,16 @@ function MaterialesUtilizados() {
                         ))}
                     </tbody>
                 </table>
-                {modalOjo && <Modal data={modalData} onClose={() => setIsModalOjo(false)} />}
+
+                {modalOjo && (
+                    <Modal
+                        data={modalData}
+                        onClose={() => setIsModalOjo(false)}
+                    />
+                )}
             </div>
+
+
             <div className="flex justify-center mt-4 gap-2">
                 {Array.from({ length: totalPages }, (_, index) => (
                     <button
@@ -291,15 +322,22 @@ function MaterialesUtilizados() {
         </div>
     );
 }
-function Modal({ data, onClose }) {
+
+function Modal({ data = [], onClose }) {
     return (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                <h2 className="text-xl font-bold mb-4">Materiales</h2>
+            <div className="bg-white p-6 rounded-lg shadow-lg w-[700px]">
+                <h2 className="text-xl font-bold mb-4">
+                    Materiales utilizados
+                </h2>
+
                 <table className="w-full border border-gray-300">
                     <thead className="bg-gray-200">
                         <tr>
+                            <th className="border p-2">ID Interno</th>
                             <th className="border p-2">Material</th>
+                            <th className="border p-2">Fracción</th>
+                            <th className="border p-2">Sub</th>
                             <th className="border p-2">Cantidad</th>
                         </tr>
                     </thead>
@@ -307,19 +345,38 @@ function Modal({ data, onClose }) {
                         {data.length > 0 ? (
                             data.map((item, index) => (
                                 <tr key={index} className="text-center">
-                                    <td className="border p-2">{item.nombre_interno}</td>
-                                    <td className="border p-2">{item.cantidad}</td>
+                                    <td className="border p-2">
+                                        {item.id_material_interno}
+                                    </td>
+                                    <td className="border p-2">
+                                        {item.nombre_interno}
+                                    </td>
+                                    <td className="border p-2">
+                                        {item.fraccion_arancelaria}
+                                    </td>
+                                    <td className="border p-2">
+                                        {item.subd}
+                                    </td>
+                                    <td className="border p-2">
+                                        {item.cantidad}
+                                    </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="2" className="border p-2 text-center">No hay materiales</td>
+                                <td
+                                    colSpan="5"
+                                    className="border p-2 text-center"
+                                >
+                                    No hay materiales
+                                </td>
                             </tr>
                         )}
                     </tbody>
                 </table>
-                <button 
-                    className="btn-crud"
+
+                <button
+                    className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700 w-full"
                     onClick={onClose}
                 >
                     Cerrar
@@ -328,6 +385,7 @@ function Modal({ data, onClose }) {
         </div>
     );
 }
+
 
 export default MaterialesUtilizados;
 
