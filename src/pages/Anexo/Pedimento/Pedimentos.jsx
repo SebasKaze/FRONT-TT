@@ -186,10 +186,10 @@ export default function Pedimento() {
 
               let badgeColor =
                 Math.abs(diferenciaDias) <= 30
-                  ? "bg-red-500 text-white"
+                  ? "bg-green-500 text-white"
                   : Math.abs(diferenciaDias) <= 90
                   ? "bg-yellow-400 text-black"
-                  : "bg-green-600 text-white";
+                  : "bg-red-600 text-white";
 
               const patente = row.no_pedimento?.substring(4, 8);
 

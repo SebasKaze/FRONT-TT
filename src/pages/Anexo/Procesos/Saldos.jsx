@@ -1,5 +1,15 @@
 import { useState, useEffect } from "react";
 
+import { Pie } from "react-chartjs-2";
+import {
+    Chart as ChartJS,
+    ArcElement,
+    Tooltip,
+    Legend
+} from "chart.js";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
+
 function Saldos() {
     const backConection = import.meta.env.VITE_BACK_URL;
 
@@ -21,6 +31,11 @@ function Saldos() {
     const [modalReporte, setIsModalReporte] = useState(false);
     const [fechaInicio, setFechaInicio] = useState("");
     const [fechaFin, setFechaFin] = useState("");
+
+const [modalGrafica, setModalGrafica] = useState(false);
+const [graficaData, setGraficaData] = useState(null);
+
+const safeTotal = graficaData?.total || 1;
 
     // =========================
     // CARGAR EMPRESAS
@@ -111,22 +126,57 @@ function Saldos() {
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-const descargarExcel = () => {
-    if (!domicilioSeleccionado) {
-        alert("Selecciona un domicilio.");
-        return;
-    }
+    const descargarExcel = () => {
+        if (!domicilioSeleccionado) {
+            alert("Selecciona un domicilio.");
+            return;
+        }
 
-    if (!selector) {
-        alert("Selecciona un tipo de saldo.");
-        return;
-    }
+        if (!selector) {
+            alert("Selecciona un tipo de saldo.");
+            return;
+        }
 
-    window.open(
-        `${backConection}/api/procesos/reporte/saldoE?id_empresa=${empresaSeleccionada}&id_domicilio=${domicilioSeleccionado}&selector=${selector}`,
-        "_blank"
-    );
+        window.open(
+            `${backConection}/api/procesos/reporte/saldoE?id_empresa=${empresaSeleccionada}&id_domicilio=${domicilioSeleccionado}&selector=${selector}`,
+            "_blank"
+        );
+    };
+
+const verGrafica = async (no_pedimento) => {
+    try {
+        const res = await fetch(
+            `${backConection}/api/procesos/saldoGrafica?id_empresa=${empresaSeleccionada}&id_domicilio=${domicilioSeleccionado}&no_pedimento=${no_pedimento}`
+        );
+
+        const data = await res.json();
+
+        setGraficaData(data); // { total, gastado, restante }
+        setModalGrafica(true);
+
+    } catch (error) {
+        console.error("Error al obtener gráfica:", error);
+    }
 };
+const pieOptions = {
+    responsive: true,
+    maintainAspectRatio: false, // Útil para controlar el tamaño en contenedores
+};
+const pieData = graficaData ? {
+    labels: ["Gastado", "Restante"],
+    datasets: [
+        {
+            label: 'Monto',
+            data: [graficaData.gastado, graficaData.restante],
+            backgroundColor: ['#FF6384', '#36A2EB'], // Colores sugeridos
+            hoverOffset: 4
+        }
+    ]
+} : null;
+
+
+
+
 
     return (
         <div className="max-w-6xl mx-auto bg-gray-100 p-5 rounded-xl">
@@ -202,6 +252,9 @@ const descargarExcel = () => {
                     </select>
                 </div>
 
+
+
+
             </div>
 
             <h2 className="text-3xl font-bold text-gray-900 mb-6 p-6">Saldo</h2>
@@ -234,6 +287,9 @@ const descargarExcel = () => {
                                     ? "Estado"
                                     : "Cantidad restante"}
                             </th>
+                            {selector === "3" && (
+                                <th className="border p-2">Ver</th>
+                            )}                            
                         </tr>
                     </thead>
                     <tbody>
@@ -248,6 +304,17 @@ const descargarExcel = () => {
                                         ? "Agotado"
                                         : row.cantidad_restante}
                                 </td>
+
+                                {selector === "3" && (
+                                    <td className="border p-2">
+                                        <button
+                                            onClick={() => verGrafica(row.no_pedimento)}
+                                            className="text-blue-600 hover:text-blue-800 text-xl"
+                                        >
+                                            👁️
+                                        </button>
+                                    </td>
+                                )}
                             </tr>
                         ))}
                     </tbody>
@@ -302,6 +369,39 @@ const descargarExcel = () => {
                         <button 
                             onClick={() => setIsModalReporte(false)} 
                             className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700 transition w-full"
+                        >
+                            Cerrar
+                        </button>
+                    </div>
+                </div>
+            )}
+            
+            {modalGrafica && graficaData && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-[450px]">
+                        <h2 className="text-xl font-bold mb-4 text-center">
+                            Consumo del Pedimento
+                        </h2>
+
+                        {/* Gráfica */}
+                        <div className="w-full flex justify-center" style={{ height: '300px' }}>
+                            {pieData ? (
+                                <Pie data={pieData} options={pieOptions} />
+                            ) : (
+                                <p>Cargando datos de la gráfica...</p>
+                            )}
+                        </div>
+
+                        {/* Datos */}
+                        <div className="mt-4 text-center">
+                            <p><strong>Total:</strong> {graficaData.total}</p>
+                            <p><strong>Gastado:</strong> {graficaData.gastado}</p>
+                            <p><strong>Restante:</strong> {graficaData.restante}</p>
+                        </div>
+
+                        <button
+                            onClick={() => setModalGrafica(false)}
+                            className="mt-4 px-4 py-2 bg-gray-500 text-white rounded w-full"
                         >
                             Cerrar
                         </button>

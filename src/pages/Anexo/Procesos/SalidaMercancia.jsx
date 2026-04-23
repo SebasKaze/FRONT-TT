@@ -104,7 +104,7 @@ function SalidaMercancia() {
             alert("Por favor, selecciona un rango de fechas.");
             return;
         }
-        window.open(`${backConection}/api/procesos/reporte/smercanciasE?id_empresa=${id_empresa}&id_domicilio=${id_domicilio}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`, "_blank");
+        window.open(`${backConection}/api/procesos/reporte/smercanciasE?id_empresa=${empresaSeleccionada}&id_domicilio=${domicilioSeleccionado}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`, "_blank");
     };
 
     return (

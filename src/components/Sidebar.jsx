@@ -13,6 +13,10 @@ function Sidebar() {
     const [subMenuOpen, setSubMenuOpen] = useState({});
     const location = useLocation();
 
+    const userData = JSON.parse(localStorage.getItem("user")) || {};
+    const { cuenta } = userData;
+
+
     useEffect(() => {
         setActiveItem(location.pathname);
     }, [location]);
@@ -68,6 +72,24 @@ function Sidebar() {
         }
     ];
 
+    const permisos = {
+        1: "ALL",
+        2: "ALL",
+        3: ["Dashboard", "Pedimentos", "Carga de datos", "Procesos", "Activo Fijo"],
+        4: ["Procesos", "Activo Fijo"]
+    };
+
+    const menusFiltrados = menus
+        .filter(menu => {
+            if (permisos[cuenta] === "ALL") return true;
+            return permisos[cuenta]?.includes(menu.title);
+        })
+        .map(menu => {
+            // Opcional: filtrar submenús si quieres hacerlo más granular después
+            return menu;
+        });
+
+
 return (
     <motion.div
         initial={{ x: -80, opacity: 0 }}
@@ -89,7 +111,7 @@ return (
         {/* Menu */}
         <div className="flex-1 overflow-y-auto">
             <ul className="px-4">
-                {menus.map((menu, index) => (
+                {menusFiltrados.map((menu, index) => (
                     <li key={index} className="mb-2">
                         {menu.route ? (
                             <Link

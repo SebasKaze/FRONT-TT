@@ -14,6 +14,13 @@ export default function Navbar() {
     const { logout } = useAuth();
     const { user } = useAuth();
 
+
+
+    const userData = JSON.parse(localStorage.getItem("user")) || {};
+    const { cuenta } = userData;
+
+
+
     // Cerrar menú si se hace click fuera
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -104,15 +111,16 @@ export default function Navbar() {
                                 >
                                     Domicilio
                                 </button>
-
-                                <button
-                                    onClick={() => handleNavigation("/registrar_empresa")}
-                                    className="w-full text-left px-4 py-3 
-                                    text-[#3b2f2f] hover:bg-[#f5e8c6] 
-                                    transition-all duration-200"
-                                >
-                                    Registrar
-                                </button>
+                                {cuenta === "1" && (
+                                    <button
+                                        onClick={() => handleNavigation("/registrar_empresa")}
+                                        className="w-full text-left px-4 py-3 
+                                        text-[#3b2f2f] hover:bg-[#f5e8c6] 
+                                        transition-all duration-200"
+                                    >
+                                        Registrar
+                                    </button>
+                                )}
 
                                 <div className="border-t border-orange-200" />
 
