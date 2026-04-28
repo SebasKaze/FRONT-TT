@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaEye } from "react-icons/fa6";
 
 export default function Pedimento() {
@@ -11,6 +12,7 @@ export default function Pedimento() {
     const [empresaSeleccionada, setEmpresaSeleccionada] = useState("");
     const [domicilioSeleccionado, setDomicilioSeleccionado] = useState("");
 
+    const navigate = useNavigate();
 
     const [isModalOpen, setModalOpen] = useState(false);
     const [modalOjo, setIsModalOjo] = useState(false);
@@ -107,15 +109,8 @@ export default function Pedimento() {
         window.open(`${backConection}/api/procesos/reporte/emercanciasP?id_empresa=${id_empresa}&id_domicilio=${id_domicilio}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`, "_blank");
     };
 
-    const fetchFracciones = async (pedimento) => {
-        try {
-            const response = await fetch(`${backConection}/api/procesos/emercancias/fracciones?no_pedimento=${pedimento}`);
-            const data = await response.json();
-            setModalData(data);
-            setIsModalOjo(true);
-        } catch (error) {
-            console.error("Error al obtener las fracciones:", error);
-        }
+    const fetchFracciones =  (pedimento) => {
+        navigate(`/pedimentos/ver/${pedimento}`);
     };
     return (
         <div className="max-w-6xl mx-auto bg-gray-100 p-5 rounded-xl">

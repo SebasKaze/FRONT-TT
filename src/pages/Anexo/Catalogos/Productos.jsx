@@ -113,6 +113,21 @@ function Productos() {
         navigate("/productos_carga");
     };
 
+
+    const handleViewClick = async (idProducto) => {
+        try {
+            const response = await fetch(
+                `${backConection}/api/verDetalleProducto?id_producto=${idProducto}`
+            );
+
+            const data = await response.json();
+
+            setPopupData(data);   // lo que regresa el backend
+            setShowPopup(true);   // abre popup
+        } catch (error) {
+            console.error("Error al obtener detalle del producto:", error);
+        }
+    };
     return (
         <div className="max-w-6xl mx-auto bg-gray-100 p-5 rounded-xl">
             <h1 className="text-3xl font-bold mb-4 text-center">Productos</h1>
@@ -194,7 +209,7 @@ function Productos() {
                                 <th className="border p-2">Subd</th>
                                 <th className="border p-2">Descripción</th>
                                 <th className="border p-2">Unidad de medida</th>
-                                <th className="border p-2"> </th>
+                                <th className="border p-2">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -221,7 +236,7 @@ function Productos() {
                                                 <button className="text-blue-500 hover:text-blue-800" onClick={() => handleEditClick(row)}>
                                                     <CiEdit />
                                                 </button>
-                                                <button className="text-gray-500 hover:text-gray-800" onClick={() => handleViewClick(row.id_producto_interno)}>
+                                                <button className="text-gray-500 hover:text-gray-800" onClick={() => handleViewClick(row.id_producto)}>
                                                     <FaEye />
                                                 </button>
                                             </>
@@ -233,7 +248,7 @@ function Productos() {
                     </table>
                 </div>
             )}
-            {/*
+            
             {showPopup && popupData && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
                     <div className="bg-white p-5 rounded-md shadow-lg w-1/3">
@@ -263,7 +278,7 @@ function Productos() {
                     </div>
                 </div>
             )}
-             */}
+            
 
         </div>
     );

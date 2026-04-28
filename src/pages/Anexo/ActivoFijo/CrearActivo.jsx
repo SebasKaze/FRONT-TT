@@ -7,15 +7,73 @@ function CambioCrearActivo() {
     const navigate = useNavigate();
     const backConection = import.meta.env.VITE_BACK_URL;
 
-    const Regresar = () => {
-        navigate("/activo-fijo");
+    const [data, setActivos] = useState([]);
+    const [empresas, setEmpresas] = useState([]);
+    const [domicilios, setDomicilios] = useState([]);
+
+    const [empresaSeleccionada, setEmpresaSeleccionada] = useState("");
+    const [domicilioSeleccionado, setDomicilioSeleccionado] = useState("");
+
+    const userData = JSON.parse(localStorage.getItem("user")) || {};
+    const { id_empresa, cuenta } = userData; 
+
+    const LimitadorBoton = cuenta === "1" || cuenta === "2" ;
+
+    // =========================
+    // CARGAR EMPRESAS
+    // =========================
+    useEffect(() => {
+        fetch(`${backConection}/api/infoempre`)
+            .then((response) => response.json())
+            .then((data) => {
+                setEmpresas(data);
+
+                // Si cuenta = 2, fijar empresa automáticamente
+                if (cuenta === "2" && id_empresa) {
+                    setEmpresaSeleccionada(id_empresa.toString());
+                }
+            })
+            .catch((error) =>
+                console.error("Error al obtener empresas:", error)
+            );
+    }, [backConection, cuenta, id_empresa]);
+    // =========================
+    // CARGAR DOMICILIOS AL CAMBIAR EMPRESA
+    // =========================
+    useEffect(() => {
+        if (!empresaSeleccionada) {
+            setDomicilios([]);
+            return;
+        }
+
+        fetch(`${backConection}/api/infodomi/${empresaSeleccionada}`)
+            .then((res) => res.json())
+            .then((data) => setDomicilios(data))
+            .catch((error) =>
+                console.error("Error al obtener domicilios:", error)
+            );
+    }, [empresaSeleccionada, backConection]);
+    // =========================
+    // CAMBIO EMPRESA
+    // =========================
+    const handleEmpresaChange = (e) => {
+        const empresaId = e.target.value;
+        setEmpresaSeleccionada(empresaId);
+        setDomicilioSeleccionado("");
+        setActivos([]);
+    };
+    // =========================
+    // CAMBIO DOMICILIO
+    // =========================
+    const handleDomicilioChange = (e) => {
+        setDomicilioSeleccionado(e.target.value);
     };
 
-    const userData = JSON.parse(localStorage.getItem("userData")) || {};
-    const { id_empresa, id_domicilio } = userData;
 
+    const Regresar = () => {
+        navigate("/activofijo");
+    };
     const [mensaje, setMensaje] = useState("");
-
     const [formData, setFormData] = useState({
         idInterno: "",
         nombre_activofijo: "",
@@ -24,9 +82,7 @@ function CambioCrearActivo() {
         descripcion: "",
         pedimentosSeleccionados: [],
     });
-
     const [pedimentos, setPedimentos] = useState([]);
-
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -34,8 +90,6 @@ function CambioCrearActivo() {
             [name]: value,
         }));
     };
-
-
     const togglePedimentoSeleccionado = (id) => {
         setFormData((prevData) => {
             const nuevosSeleccionados = prevData.pedimentosSeleccionados.includes(id)
@@ -49,21 +103,22 @@ function CambioCrearActivo() {
         });
     };
     
-    
+    const handleBuscarPedimentos = async () => {
+        if (!empresaSeleccionada || !domicilioSeleccionado) {
+            alert("Selecciona empresa y domicilio");
+            return;
+        }
 
-    // Cargar pedimentos desde el backend
-    useEffect(() => {
-        const fetchPedimentos = async () => {
-            try {
-                const response = await axios.get(`${backConection}/api/pedimentoAf/activofijo?id_empresa=${id_empresa}&id_domicilio=${id_domicilio}`);
-                setPedimentos(response.data);
-            } catch (error) {
-                console.error("Error al obtener pedimentos:", error);
-            }
-        };
+        try {
+            const response = await axios.get(
+                `${backConection}/api/pedimentoAf/activofijo?id_empresa=${empresaSeleccionada}&id_domicilio=${domicilioSeleccionado}`
+            );
 
-        fetchPedimentos();
-    }, [id_empresa, id_domicilio]);
+            setPedimentos(response.data);
+        } catch (error) {
+            console.error("Error al obtener pedimentos:", error);
+        }
+    };
 
     // Enviar datos al backend
     const handleSubmit = async (e) => {
@@ -116,6 +171,72 @@ function CambioCrearActivo() {
                 </button>
             </div>
             <h1 className="text-2xl font-bold text-gray-800 mb-4 pt-6">Crear un Activo Fijo</h1>
+
+            <div>
+                <h1 className="text-2xl font-bold mb-4">
+                    Selecciona una Empresa y Domicilio
+                </h1>
+
+                <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label className="block mb-2 font-semibold">
+                            Empresa
+                        </label>
+                        <select
+                            value={empresaSeleccionada}
+                            onChange={handleEmpresaChange}
+                            disabled={cuenta === "2"}
+                            className="w-full border rounded-md p-2 disabled:bg-gray-200"
+                        >
+                            <option value="">-- Seleccionar Empresa --</option>
+                            {empresas
+                                .filter((empresa) =>
+                                    cuenta === "2"
+                                        ? empresa.id_empresa === Number(id_empresa)
+                                        : true
+                                )
+                                .map((empresa) => (
+                                    <option
+                                        key={empresa.id_empresa}
+                                        value={empresa.id_empresa}
+                                    >
+                                        {empresa.nombre}
+                                    </option>
+                                ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block mb-2 font-semibold">
+                            Domicilio
+                        </label>
+                        <select
+                            value={domicilioSeleccionado}
+                            onChange={handleDomicilioChange}
+                            disabled={!empresaSeleccionada}
+                            className="w-full border rounded-md p-2 disabled:bg-gray-200"
+                        >
+                            <option value="">-- Seleccionar Domicilio --</option>
+                            {domicilios.map((domi) => (
+                                <option
+                                    key={domi.id_domicilio}
+                                    value={domi.id_domicilio}
+                                >
+                                    {domi.texto}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button
+                onClick={handleBuscarPedimentos}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg mb-6"
+            >
+                Buscar pedimentos
+            </button>
+
             <div>
                 {mensaje && <p className="text-green-600 font-bold">{mensaje}</p>}
                 <form className="grid grid-cols-5 gap-4" onSubmit={handleSubmit}>
