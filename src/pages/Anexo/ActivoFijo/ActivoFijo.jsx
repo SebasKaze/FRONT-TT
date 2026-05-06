@@ -172,8 +172,8 @@ function ActivoFijo() {
                             <tr key={activo.id_activo_fijo_interno}>
                                 <td className="border px-4 py-2">{activo.id_activo_fijo_interno}</td>
                                 <td className="border px-4 py-2">{activo.fraccion_arancelaria}</td>
-                                <td className="border px-4 py-2">{activo.nombre_activofijo}</td>
-                                <td className="border px-4 py-2">{activo.ubicacion_interna}</td>
+                                <td className="border px-4 py-2">{activo.nombre}</td>
+                                <td className="border px-4 py-2">{activo.ubi_interna}</td>
                                 <td className="border px-4 py-2">{activo.descripcion}</td>
                                 <td className="border px-4 py-2">
                                 <button 

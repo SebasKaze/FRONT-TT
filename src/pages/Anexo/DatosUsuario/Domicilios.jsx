@@ -31,7 +31,7 @@ function Domicilios() {
     }, []);
 
     return (
-        <div className="main-container">
+        <div className="max-w-6xl mx-auto bg-gray-100 p-5 rounded-xl">
             <h2 className="text-2xl font-bold mb-4">Domicilios</h2>
 
             {/* Tabla de Domicilios */}

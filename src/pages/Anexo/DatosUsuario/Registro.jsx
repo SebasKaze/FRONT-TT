@@ -217,7 +217,7 @@ function Registro() {
                 {mensaje}
                 </div>
                 )}
-                <h2 className="text-lg font-bold mb-4">Nueva Empresa</h2>
+                <h2 className="text-2xl font-bold mb-4 text-center">Nueva Empresa</h2>
                 <form onSubmit={handleSubmit} className="grid grid-cols-5 gap-4">
                     <div className="flex flex-col items-center text-center">
                         <label className="mb-2">Nombre</label>
@@ -278,7 +278,7 @@ function Registro() {
                     </div>
                 </form>
             </div>
-            <div className="w-full h-screen p-0 m-0 flex flex-col">
+            <div className="p-6">
                 <h1 className="text-2xl font-bold mb-4 text-center">Domicilios</h1>
                 <form onSubmit={handleSubmitDomi} className="flex flex-col gap-4 px-4">
                     {/* Selección de empresa */}
@@ -353,8 +353,8 @@ function Registro() {
                     </div>
                 </form>
             </div>
-            <div className="w-full h-screen p-0 m-0 flex flex-col">
-                <h1 className="text-lg font-bold mb-4">Registro de Usuarios</h1>
+            <div className="p-6">
+                <h1 className="text-2xl font-bold mb-4 text-center">Registro de Usuarios</h1>
                 <form className="grid grid-cols-5 gap-4" onSubmit={handleSubmitUsuario}>
                     {/* Selección de empresa */}
                     <div className="flex flex-col items-center text-center col-span-5">

@@ -30,9 +30,12 @@ function VerPedimento() {
 
     const tabs = [
         { id: "general", label: "General" },
-        { id: "encabezado", label: "Encabezado" },
-        { id: "proveedores", label: "Proveedores" },
-        { id: "transporte", label: "Transporte" },
+        { id: "encabezado", label: "Encabezado Principal" },
+        { id: "encasec", label: "Encabezado Secundario" },
+        { id: "proveedores", label: "Proveedores/Comprador" },
+        { id: "destina", label: "Datos Destinatario" },
+        { id: "transporte", label: "Datos transporte y transportista" },
+        { id: "candados", label: "Candados" },
         { id: "totales", label: "Totales" },
         { id: "partidas", label: "Partidas" },
     ];
@@ -60,8 +63,11 @@ function VerPedimento() {
             <main className="tab-content">
                 {activeTab === "general" && <General data={data.pedimento} />}
                 {activeTab === "encabezado" && <Encabezado data={data.encabezado} />}
+                {activeTab === "encasec" && <EncabezadoSec data={data.encabezadosec} />}
                 {activeTab === "proveedores" && <Proveedores data={data.proveedores} />}
+                {activeTab === "destina" && <Destinos data={data.destinos} />}
                 {activeTab === "transporte" && <Transporte data={data.transportes} />}
+                {activeTab === "candados" && <Candados data={data.candados} />}
                 {activeTab === "totales" && <Totales data={data} />}
                 {activeTab === "partidas" && <Partidas data={data.partidas} />}
             </main>
@@ -92,34 +98,83 @@ function Encabezado({ data }) {
     return (
         <div className="card">
             <p><strong>Régimen:</strong> {data.regimen}</p>
+            <p><strong>Destino/Origen:</strong> {data.des_ori}</p>
             <p><strong>Tipo cambio:</strong> {data.tipo_cambio}</p>
-            <p><strong>Peso bruto:</strong> {data.peso_bruto}</p>
+            <p><strong>Peso Bruto:</strong> {data.peso_bruto}</p>
+            <p><strong>Aduana E/S:</strong> {data.aduana_e_s}</p>
+            <p><strong>Medio Transporte:</strong> {data.medio_transpo}</p>
+            <p><strong>Medio Transporte Arribo:</strong> {data.medio_transpo_arri}</p>
+            <p><strong>Medio Transporte Salida:</strong> {data.medio_transpo_sali}</p>
+            <p><strong>Valor Dolares:</strong> {data.valor_dolares}</p>
+            <p><strong>Valor Aduana:</strong> {data.valor_aduana}</p>
+            <p><strong>Precio Pagado:</strong> {data.precio_pagado}</p>
+            <p><strong>RFC IMP/EXP</strong> {data.rfc_import_export}</p>
+            <p><strong>CURP IMP/EXP:</strong> {data.curp_import_export}</p>
+            <p><strong>Razon Social:</strong> {data.razon_so_im_ex}</p>
+            <p><strong>Domicilio:</strong> {data.domicilio_im_ex}</p>
+            <p><strong>Valor Seguros:</strong> {data.val_seguros}</p>
+            <p><strong>Seguros:</strong> {data.seguros}</p>
+            <p><strong>Fletes:</strong> {data.fletes}</p>
+            <p><strong>Embalajes:</strong> {data.embalajes}</p>
+            <p><strong>Otros Incrementales:</strong> {data.otros_incremen}</p>
+            <p><strong>Transporte Decremental:</strong> {data.transpo_decremen}</p>
+            <p><strong>Seguro Decremental:</strong> {data.seguro_decremen}</p>
+            <p><strong>Carga Decremental:</strong> {data.carga_decemen}</p>
+            <p><strong>Descargo Decremental:</strong> {data.desc_decremen}</p>
+            <p><strong>Otro Decremental:</strong> {data.otro_decremen}</p>
+            <p><strong>Acuse:</strong> {data.acuse_electroni_val}</p>
+            <p><strong>Codigo de Barras:</strong> {data.codigo_barra}</p>
+            <p><strong>Total Bultos:</strong> {data.total_bultos}</p>
+            <p><strong>Fecha Entrada:</strong> {data.fecha_en}</p>
+            <p><strong>Fecha Salida:</strong> {data.feca_sal}</p>
+            <p><strong>Clave Despacho:</strong> {data.clv_sec_edu_despacho}</p>
+        </div>
+    );
+}
+
+function EncabezadoSec({ data }) {
+    if (!data) return <div>Sin encabezado secundario</div>;
+
+    return (
+        <div className="card">
+            <p><strong>RFC IMP/EXP:</strong> {data.rfc_import_export}</p>
+            <p><strong>CURP IMP/EXP:</strong> {data.curp_import_export}</p>
         </div>
     );
 }
 
 function Proveedores({ data }) {
-    if (!data || data.length === 0) return <div className="empty-state">No hay proveedores</div>;
+    if (!data) return <div>Sin Proveedores</div>;
+
     return (
-        <div className="table-wrapper">
-            <table className="modern-table">
-                <thead>
-                    <tr>
-                        <th>RFC / ID Fiscal</th>
-                        <th>Nombre / Razón Social</th>
-                        <th className="text-right">Valor Dólares</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map((p, i) => (
-                        <tr key={i}>
-                            <td className="font-mono">{p.id_fiscal}</td>
-                            <td>{p.nom_razon_social}</td>
-                            <td className="text-right highlight-price">${Number(p.val_dolares).toLocaleString()}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+        <div>
+            {data.map((prov, index) => (
+                <div key={index} className="card mb-3">
+                    <p><strong>ID Fiscal:</strong> {prov.id_fiscal}</p>
+                    <p><strong>Razon Social:</strong> {prov.nom_razon_social}</p>
+                    <p><strong>Domicilio:</strong> {prov.domicilio}</p>
+                    <p><strong>Vinculacion:</strong> {prov.vinculacion}</p>
+                    <p><strong>Numero CFDI:</strong> {prov.no_cfdi}</p>
+                    <p><strong>Fecha Facturacion:</strong> {prov.fecha_factu}</p>
+                    <p><strong>INCOTERM:</strong> {prov.incoterm}</p>
+                    <p><strong>Moneda Facturacion:</strong> {prov.moneda_fact}</p>
+                    <p><strong>Valor Moneda Facturacion:</strong> {prov.val_mon_fact}</p>
+                    <p><strong>Factor Moneda Facturacion:</strong> {prov.factor_mon_fact}</p>
+                    <p><strong>Valor Dolares:</strong> {prov.val_dolares}</p>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+function Destinos({ data }) {
+    if (!data) return <div>Sin Proveedores</div>;
+
+    return (
+        <div className="card">
+            <p><strong>ID Fiscal:</strong> {data.id_fiscal}</p>
+            <p><strong>Nombre Destino:</strong> {data.nom_d_d}</p>
+            <p><strong>Domicilio Destiono:</strong> {data.dom_d_d}</p>
         </div>
     );
 }
@@ -131,10 +186,26 @@ function Transporte({ data }) {
         <div>
             {data.map((t, i) => (
                 <div key={i} className="card">
-                    <p>{t.transportista}</p>
-                    <p>{t.pais}</p>
+                    <p><strong>Identificacion:</strong>{t.identificacion}</p>
+                    <p><strong>Pais:</strong>{t.pais}</p>
+                    <p><strong>Transportista:</strong>{t.transportista}</p>
+                    <p><strong>RFC Transportista:</strong>{t.rfc_transportista}</p>
+                    <p><strong>CURP Transportista:</strong>{t.curp_transportista}</p>
+                    <p><strong>Domicilio Transportista:</strong>{t.domicilio_transportista}</p>
                 </div>
             ))}
+        </div>
+    );
+}
+
+function Candados({ data }) {
+    if (!data) return <div>Sin Candados</div>;
+
+    return (
+        <div className="card">
+            <p><strong>Numero Candado:</strong> {data.numero_candado}</p>
+            <p><strong>Revision 1:</strong> {data.revision1}</p>
+            <p><strong>Revision 2:</strong> {data.revision2}</p>
         </div>
     );
 }

@@ -301,7 +301,7 @@ function Materiales() {
                                     <td>{row.fraccion_arancelaria}</td>
                                     <td>{row.subd}</td>
                                     <td>{row.descripcion_fraccion}</td>
-                                    <td>{row.unidad_medida}</td>
+                                    <td>{row.unidadmedida}</td>
 
                                     <td className="flex gap-2 justify-center">
                                         <button

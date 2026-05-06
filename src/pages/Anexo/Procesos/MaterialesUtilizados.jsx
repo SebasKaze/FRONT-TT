@@ -213,7 +213,7 @@ function MaterialesUtilizados() {
             <div className="w-full mb-4">
                 <button
                     onClick={() => setIsModalReporte(true)} 
-                    className="px-4 py-4 bg-blue-500 text-white rounded hover:bg-blue-700 transition">
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition">
                     Generar Reporte
                 </button>
             </div>
@@ -279,7 +279,7 @@ function MaterialesUtilizados() {
             </div>
             {/* MODAL */}
             {modalReporte && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-96">
                         <h2 className="text-xl font-semibold mb-4">Generar Reporte</h2>
 

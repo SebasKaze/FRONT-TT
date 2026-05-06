@@ -27,7 +27,7 @@ export default function CargaMateriales() {
         idInterno: "",
         nombreFracc: "",
         fraccion: "",
-        subd:"",
+        subd: "",
         descripcionFraccion: "",
         unidadMedida: "",
     });
@@ -119,7 +119,7 @@ export default function CargaMateriales() {
                 idInterno: "",
                 nombreFracc: "",
                 fraccion: "",
-                subd:"",
+                subd: "",
                 descripcionFraccion: "",
                 unidadMedida: "",
             });
@@ -141,146 +141,168 @@ export default function CargaMateriales() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto bg-gray-100 p-5 rounded-xl">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6">
+            {/* Mensaje flotante */}
             {mensaje && (
-                <div className="fixed top-4 right-4 bg-green-500 text-white p-4 rounded-md shadow-md">
-                    {mensaje}
+                <div className="fixed top-6 right-6 z-50 animate-pulse bg-white border-l-4 border-green-500 shadow-lg rounded-lg p-4 flex items-center gap-3 transition-all duration-300">
+                    <span className="text-green-600 text-sm font-medium">{mensaje}</span>
+                    <button
+                        onClick={() => setMensaje("")}
+                        className="text-gray-400 hover:text-gray-600"
+                    >
+                        ✕
+                    </button>
                 </div>
             )}
 
+            {/* Botón regresar */}
             <button
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg mb-6"
+                className="group flex items-center gap-2 text-gray-600 hover:text-blue-700 font-medium transition-colors duration-200 mb-6"
                 onClick={Regresar}
             >
-                <IoMdArrowRoundBack className="inline mr-2" />
+                <IoMdArrowRoundBack className="text-xl group-hover:-translate-x-1 transition-transform" />
                 Regresar
             </button>
 
-            <h2 className="text-lg font-bold mb-4">Nuevo Material</h2>
+            {/* Tarjeta principal */}
+            <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-700 to-indigo-800 px-6 py-4">
+                    <h2 className="text-xl font-bold text-white">Nuevo Material</h2>
+                    <p className="text-blue-100 text-sm mt-1">Complete los detalles del material a cargar</p>
+                </div>
 
-            <form
-                onSubmit={handleSubmit}
-                className="grid grid-cols-2 md:grid-cols-3 gap-4 bg-white p-6 rounded-xl shadow-md"
-            >
-                {/* EMPRESA */}
-                <div>
-                    <label className="block mb-2">Empresa</label>
-                    <select
-                        value={empresaSeleccionada}
-                        onChange={handleEmpresaChange}
-                        required
-                        className="w-full border rounded-md p-2"
-                    >
-                        <option value="">Selecciona empresa</option>
-                        {empresas.map((empresa) => (
-                            <option
-                                key={empresa.id_empresa}
-                                value={empresa.id_empresa}
+                <form onSubmit={handleSubmit} className="p-6 md:p-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {/* Empresa */}
+                        <div className="space-y-1">
+                            <label className="block text-sm font-semibold text-gray-700">Empresa</label>
+                            <select
+                                value={empresaSeleccionada}
+                                onChange={handleEmpresaChange}
+                                required
+                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                             >
-                                {empresa.nombre}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                                <option value="">Selecciona empresa</option>
+                                {empresas.map((empresa) => (
+                                    <option key={empresa.id_empresa} value={empresa.id_empresa}>
+                                        {empresa.nombre}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
-                {/* DOMICILIO */}
-                <div>
-                    <label className="block mb-2">Domicilio</label>
-                    <select
-                        value={domicilioSeleccionado}
-                        onChange={handleDomicilioChange}
-                        required
-                        disabled={!empresaSeleccionada}
-                        className="w-full border rounded-md p-2 disabled:bg-gray-200"
-                    >
-                        <option value="">Selecciona domicilio</option>
-                        {domicilios.map((domi) => (
-                            <option
-                                key={domi.id_domicilio}
-                                value={domi.id_domicilio}
+                        {/* Domicilio */}
+                        <div className="space-y-1">
+                            <label className="block text-sm font-semibold text-gray-700">Domicilio</label>
+                            <select
+                                value={domicilioSeleccionado}
+                                onChange={handleDomicilioChange}
+                                required
+                                disabled={!empresaSeleccionada}
+                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500 transition-all"
                             >
-                                {domi.texto}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                                <option value="">Selecciona domicilio</option>
+                                {domicilios.map((domi) => (
+                                    <option key={domi.id_domicilio} value={domi.id_domicilio}>
+                                        {domi.texto}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
-                {/* CAMPOS */}
-                <div>
-                    <label>ID</label>
-                    <input
-                        type="text"
-                        name="idInterno"
-                        value={formData.idInterno}
-                        onChange={handleChange}
-                        className="w-full border rounded-md p-2"
-                    />
-                </div>
+                        {/* ID Interno */}
+                        <div className="space-y-1">
+                            <label className="block text-sm font-semibold text-gray-700">ID Interno</label>
+                            <input
+                                type="text"
+                                name="idInterno"
+                                value={formData.idInterno}
+                                onChange={handleChange}
+                                placeholder="Ej: MAT-001"
+                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            />
+                        </div>
 
-                <div>
-                    <label>Nombre</label>
-                    <input
-                        type="text"
-                        name="nombreFracc"
-                        value={formData.nombreFracc}
-                        onChange={handleChange}
-                        className="w-full border rounded-md p-2"
-                    />
-                </div>
+                        {/* Nombre */}
+                        <div className="space-y-1">
+                            <label className="block text-sm font-semibold text-gray-700">Nombre</label>
+                            <input
+                                type="text"
+                                name="nombreFracc"
+                                value={formData.nombreFracc}
+                                onChange={handleChange}
+                                placeholder="Nombre del material"
+                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            />
+                        </div>
 
-                <div>
-                    <label>Fracción</label>
-                    <input
-                        type="text"
-                        name="fraccion"
-                        value={formData.fraccion}
-                        onChange={handleChange}
-                        className="w-full border rounded-md p-2"
-                    />
-                </div>
+                        {/* Fracción */}
+                        <div className="space-y-1">
+                            <label className="block text-sm font-semibold text-gray-700">Fracción</label>
+                            <input
+                                type="text"
+                                name="fraccion"
+                                value={formData.fraccion}
+                                onChange={handleChange}
+                                placeholder="Fracción"
+                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            />
+                        </div>
 
-                <div>
-                    <label>Subd</label>
-                    <input
-                        type="text"
-                        name="subd"
-                        value={formData.subd}
-                        onChange={handleChange}
-                        className="w-full border rounded-md p-2"
-                    />
-                </div>
+                        {/* Subd */}
+                        <div className="space-y-1">
+                            <label className="block text-sm font-semibold text-gray-700">Subd</label>
+                            <input
+                                type="text"
+                                name="subd"
+                                value={formData.subd}
+                                onChange={handleChange}
+                                placeholder="Subd"
+                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            />
+                        </div>
 
-                <div>
-                    <label>Descripción</label>
-                    <input
-                        type="text"
-                        name="descripcionFraccion"
-                        value={formData.descripcionFraccion}
-                        onChange={handleChange}
-                        className="w-full border rounded-md p-2"
-                    />
-                </div>
+                        {/* Descripción */}
+                        <div className="space-y-1 lg:col-span-2">
+                            <label className="block text-sm font-semibold text-gray-700">Descripción</label>
+                            <input
+                                type="text"
+                                name="descripcionFraccion"
+                                value={formData.descripcionFraccion}
+                                onChange={handleChange}
+                                placeholder="Descripción detallada"
+                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            />
+                        </div>
 
-                <div>
-                    <label>Unidad Medida</label>
-                    <input
-                        type="text"
-                        name="unidadMedida"
-                        value={formData.unidadMedida}
-                        onChange={handleChange}
-                        className="w-full border rounded-md p-2"
-                    />
-                </div>
+                        {/* Unidad Medida (select) */}
+                        <div className="space-y-1">
+                            <label className="block text-sm font-semibold text-gray-700">Unidad Medida</label>
+                            <select
+                                name="unidadMedida"
+                                value={formData.unidadMedida}
+                                onChange={handleChange}
+                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            >
+                                <option value="">Seleccione unidad</option>
+                                <option value="KG">Kilogramos (KG)</option>
+                                <option value="LT">Litros (LT)</option>
+                                <option value="PZ">Piezas (PZ)</option>
+                            </select>
+                        </div>
+                    </div>
 
-                <div className="col-span-2 md:col-span-3">
-                    <button
-                        type="submit"
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg"
-                    >
-                        Agregar
-                    </button>
-                </div>
-            </form>
+                    {/* Botón enviar */}
+                    <div className="mt-8 flex justify-center">
+                        <button
+                            type="submit"
+                            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] focus:ring-4 focus:ring-blue-200"
+                        >
+                            + Agregar Material
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }

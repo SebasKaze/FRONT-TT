@@ -17,7 +17,7 @@ import Dashboard from "./pages/Dashboard"
 //Pedimentos
 import Pedimento from "./pages/Anexo/Pedimento/Pedimentos"
 import PedimentoVer from "./pages/Anexo/Pedimento/PedimentoVer"
-//import PedimentoEditar from "./pages/Anexo/Pedimento/PedimentoEditar"
+import PedimentoEditar from "./pages/Anexo/Pedimento/PedimentoEditar"
 
 //Procesos
 import EntradaMercancia from "./pages/Anexo/Procesos/EntradaMercancia"
@@ -66,6 +66,7 @@ function App() {
           <Route path="/" element={<Home />} />
           {/* Pedimentos */}
           <Route path="/pedimento" element={<PrivateRoute> <Pedimento /> </PrivateRoute>}/>
+          <Route path="/pedimentos/editar/:id" element={<PrivateRoute> <PedimentoEditar /> </PrivateRoute>}/>
           <Route path="/pedimentos/ver/:id" element={<PrivateRoute> <PedimentoVer /> </PrivateRoute>}/>
           {/* Catalogos */}
           <Route path="/productos" element={<Productos />}/>

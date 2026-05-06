@@ -9,29 +9,22 @@ function ProductosCarga() {
     const navigate = useNavigate();
 
     const [materiales, setMateriales] = useState([]); 
-    const [seleccionados, setSeleccionados] = useState([]); // Ahora es un array
-    const userData = JSON.parse(localStorage.getItem("user")) || {};//Informacion del token
-
-    const { id_empresa } = userData; // Extraer los IDs necesarios
+    const [seleccionados, setSeleccionados] = useState([]);
+    const userData = JSON.parse(localStorage.getItem("user")) || {};
 
     const [empresas, setEmpresas] = useState([]);
     const [domicilios, setDomicilios] = useState([]);
     const [empresaSeleccionada, setEmpresaSeleccionada] = useState("");
     const [domicilioSeleccionado, setDomicilioSeleccionado] = useState("");
 
-
-
-
     const [formData, setFormData] = useState({
         id: "",
         nombre: "",
         fraccion: "",
-        subd:"",
+        subd: "",
         descripcion: "",
         unidadMedida: "",
         cantidad: "",
-        id_empresa: "",
-        id_domicilio: ""
     });
 
     useEffect(() => {
@@ -45,7 +38,6 @@ function ProductosCarga() {
 
     const handleEmpresaChange = (e) => {
         const empresaId = e.target.value;
-
         setEmpresaSeleccionada(empresaId);
         setDomicilioSeleccionado("");
         setDomicilios([]);
@@ -61,7 +53,6 @@ function ProductosCarga() {
                 );
         }
     };
-
 
     const handleDomicilioChange = (e) => {
         const domicilioId = e.target.value;
@@ -80,24 +71,32 @@ function ProductosCarga() {
         }
     };
 
-
     const agregarMaterial = (material) => {
         if (!seleccionados.some((m) => m.id_material_interno === material.id_material_interno)) {
-            setSeleccionados([...seleccionados, { ...material, cantidad: 1 }]);
+            setSeleccionados([...seleccionados, { 
+                ...material, 
+                cantidad: 1,
+                merma: 0
+            }]);
         }
     };
 
-    const cambiarCantidad = (id, cantidad) => {
-        setSeleccionados([...seleccionados, { 
-            ...material, 
-            cantidad: 1,
-            merma: 0
-        }]);
-    };
-    const cambiarMerma = (id, merma) => {
+    const cambiarCantidad = (id, nuevaCantidad) => {
+        const cantidadParsed = parseFloat(nuevaCantidad);
+        if (isNaN(cantidadParsed)) return;
         setSeleccionados(seleccionados.map((m) =>
             m.id_material_interno === id
-                ? { ...m, merma: parseFloat(merma) || 0 }
+                ? { ...m, cantidad: cantidadParsed }
+                : m
+        ));
+    };
+
+    const cambiarMerma = (id, nuevaMerma) => {
+        const mermaParsed = parseFloat(nuevaMerma);
+        if (isNaN(mermaParsed)) return;
+        setSeleccionados(seleccionados.map((m) =>
+            m.id_material_interno === id
+                ? { ...m, merma: mermaParsed }
                 : m
         ));
     };
@@ -114,7 +113,7 @@ function ProductosCarga() {
 
         const dataEnviar = {
             ...formData,
-            materiales: seleccionados, 
+            materiales: seleccionados,
             id_usuario: userData.id_usuario,
             id_empresa: empresaSeleccionada,
             id_domicilio: domicilioSeleccionado,
@@ -129,12 +128,11 @@ function ProductosCarga() {
                     id: "",
                     nombre: "",
                     fraccion: "",
-                    subd:"",
+                    subd: "",
                     descripcion: "",
                     unidadMedida: "",
                     cantidad: "",
                 });
-
                 setSeleccionados([]);
             })
             .catch(error => console.error("Error al enviar:", error));
@@ -146,8 +144,8 @@ function ProductosCarga() {
 
     const [filtro, setFiltro] = useState("");
     const materialesFiltrados = materiales.filter((material) =>
-        (material.nombre_interno.toLowerCase() || "").includes(filtro.toLowerCase()) || 
-        (material.descripcion_fraccion.toLowerCase() || "").includes(filtro.toLowerCase())
+        (material.nombre_interno?.toLowerCase() || "").includes(filtro.toLowerCase()) || 
+        (material.descripcion_fraccion?.toLowerCase() || "").includes(filtro.toLowerCase())
     );
 
     return (
@@ -164,9 +162,7 @@ function ProductosCarga() {
                 <div className="w-full md:w-1/2 p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         <div>
-                            <label className="block mb-2 font-semibold">
-                                Empresa
-                            </label>
+                            <label className="block mb-2 font-semibold">Empresa</label>
                             <select
                                 value={empresaSeleccionada}
                                 onChange={handleEmpresaChange}
@@ -174,10 +170,7 @@ function ProductosCarga() {
                             >
                                 <option value="">-- Seleccionar Empresa --</option>
                                 {empresas.map((empresa) => (
-                                    <option
-                                        key={empresa.id_empresa}
-                                        value={empresa.id_empresa}
-                                    >
+                                    <option key={empresa.id_empresa} value={empresa.id_empresa}>
                                         {empresa.nombre}
                                     </option>
                                 ))}
@@ -185,9 +178,7 @@ function ProductosCarga() {
                         </div>
 
                         <div>
-                            <label className="block mb-2 font-semibold">
-                                Domicilio
-                            </label>
+                            <label className="block mb-2 font-semibold">Domicilio</label>
                             <select
                                 value={domicilioSeleccionado}
                                 onChange={handleDomicilioChange}
@@ -196,10 +187,7 @@ function ProductosCarga() {
                             >
                                 <option value="">-- Seleccionar Domicilio --</option>
                                 {domicilios.map((domi) => (
-                                    <option
-                                        key={domi.id_domicilio}
-                                        value={domi.id_domicilio}
-                                    >
+                                    <option key={domi.id_domicilio} value={domi.id_domicilio}>
                                         {domi.texto}
                                     </option>
                                 ))}
@@ -209,7 +197,7 @@ function ProductosCarga() {
                     <h2 className="text-lg font-bold mb-4">Datos del Producto</h2>
                     <form>
                         {[
-                            { label: "ID", name: "id" },
+                            { label: "ID/No.Parte", name: "id" },
                             { label: "Nombre", name: "nombre" },
                             { label: "Fracción", name: "fraccion" },
                             { label: "Subd", name: "subd" },
@@ -241,21 +229,18 @@ function ProductosCarga() {
                         className="w-full border rounded-md p-2 mb-2 focus:outline-none focus:ring focus:ring-blue-300"
                     />
                     <div className="max-h-60 overflow-auto border rounded-md p-2">
-                    {materialesFiltrados.length > 0 ? (
-                        materialesFiltrados.map((material) => (
-                            <div key={material.id_material_interno} className="flex justify-between items-center p-2 border-b">
-                                <span>{material.nombre_interno} | {material.descripcion_fraccion}</span>
-                                <button
-                                    onClick={() => agregarMaterial(material)}
-                                    className="btn-agregar"
-                                >
-                                    <FaPlus />
-                                </button>
-                            </div>
-                        ))
-                    ) : (
-                        <p className="text-gray-500 text-center">No se encontraron materiales</p>
-                    )}
+                        {materialesFiltrados.length > 0 ? (
+                            materialesFiltrados.map((material) => (
+                                <div key={material.id_material_interno} className="flex justify-between items-center p-2 border-b">
+                                    <span>{material.nombre_interno} | {material.descripcion_fraccion}</span>
+                                    <button onClick={() => agregarMaterial(material)} className="btn-agregar">
+                                        <FaPlus />
+                                    </button>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-gray-500 text-center">No se encontraron materiales</p>
+                        )}
                     </div>
 
                     {seleccionados.length > 0 && (
@@ -276,25 +261,24 @@ function ProductosCarga() {
                                             <td className="border p-2">{material.nombre_interno}</td>
                                             <td className="border p-2">
                                                 <input
-                                                    type="text"
+                                                    type="number"
+                                                    step="any"
                                                     value={material.cantidad}
                                                     onChange={(e) => cambiarCantidad(material.id_material_interno, e.target.value)}
-                                                    className="w-16 border rounded-md p-1 text-center"
+                                                    className="w-20 border rounded-md p-1 text-center"
                                                 />
                                             </td>
                                             <td className="border p-2">
                                                 <input
-                                                    type="text"
+                                                    type="number"
+                                                    step="any"
                                                     value={material.merma}
                                                     onChange={(e) => cambiarMerma(material.id_material_interno, e.target.value)}
-                                                    className="w-16 border rounded-md p-1 text-center"
+                                                    className="w-20 border rounded-md p-1 text-center"
                                                 />
                                             </td>
                                             <td className="border p-2">
-                                                <button
-                                                    onClick={() => eliminarMaterial(material.id_material_interno)}
-                                                    className="btn-eliminar"
-                                                >
+                                                <button onClick={() => eliminarMaterial(material.id_material_interno)} className="btn-eliminar">
                                                     <FaTrash />
                                                 </button>
                                             </td>
@@ -306,7 +290,7 @@ function ProductosCarga() {
                     )}
 
                     <button
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg"
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg mt-4"
                         onClick={enviarProductos}
                     >
                         Enviar Productos

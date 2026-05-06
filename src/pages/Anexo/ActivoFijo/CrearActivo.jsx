@@ -80,7 +80,7 @@ function CambioCrearActivo() {
         fraccion: "",
         ubicacion_interna: "",
         descripcion: "",
-        pedimentosSeleccionados: [],
+        pedimentoSeleccionado: "",
     });
     const [pedimentos, setPedimentos] = useState([]);
     const handleChange = (e) => {
@@ -90,18 +90,7 @@ function CambioCrearActivo() {
             [name]: value,
         }));
     };
-    const togglePedimentoSeleccionado = (id) => {
-        setFormData((prevData) => {
-            const nuevosSeleccionados = prevData.pedimentosSeleccionados.includes(id)
-                ? prevData.pedimentosSeleccionados.filter((item) => item !== id)
-                : [...prevData.pedimentosSeleccionados, id];
-    
-            return {
-                ...prevData,
-                pedimentosSeleccionados: nuevosSeleccionados,
-            };
-        });
-    };
+
     
     const handleBuscarPedimentos = async () => {
         if (!empresaSeleccionada || !domicilioSeleccionado) {
@@ -127,12 +116,13 @@ function CambioCrearActivo() {
         try {
             const dataToSend = {
                 ...formData,
+                pedimento: formData.pedimentoSeleccionado, // 👈 nuevo campo limpio
                 id_usuario: userData.id_usuario,
-                id_empresa: userData.id_empresa,
-                id_domicilio: userData.id_domicilio,
+                id_empresa: empresaSeleccionada,
+                id_domicilio: domicilioSeleccionado,
             };
 
-            const response = await fetch(`${backConection}/api/crearaf`, {
+            const response = await fetch(`${backConection}/api/cargaaf`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -164,7 +154,7 @@ function CambioCrearActivo() {
     };
 
     return (
-        <div className="main-container">
+        <div className="max-w-6xl mx-auto bg-gray-100 p-5 rounded-xl">
             <div>
                 <button className="btn-crud" onClick={Regresar}>
                     <IoMdArrowRoundBack /> Regresar
@@ -239,7 +229,7 @@ function CambioCrearActivo() {
 
             <div>
                 {mensaje && <p className="text-green-600 font-bold">{mensaje}</p>}
-                <form className="grid grid-cols-5 gap-4" onSubmit={handleSubmit}>
+                <form className="grid grid-cols-2 md:grid-cols-3 gap-6" onSubmit={handleSubmit}>
                     <div className="flex flex-col items-center text-center">
                         <label className="mb-2">ID</label>
                         <input
@@ -247,7 +237,7 @@ function CambioCrearActivo() {
                             name="idInterno"
                             value={formData.idInterno}
                             onChange={handleChange}
-                            className="w-full border rounded-md p-2 focus:outline-none focus:ring focus:ring-green-300"
+                            className="w-full border rounded-lg p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
                         />
                     </div>
                     <div className="flex flex-col items-center text-center">
@@ -257,7 +247,7 @@ function CambioCrearActivo() {
                             name="fraccion"
                             value={formData.fraccion}
                             onChange={handleChange}
-                            className="w-full border rounded-md p-2 focus:outline-none focus:ring focus:ring-green-300"
+                            className="w-full border rounded-lg p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
                         />
                     </div>
                     <div className="flex flex-col items-center text-center">
@@ -267,7 +257,7 @@ function CambioCrearActivo() {
                             name="nombre_activofijo"
                             value={formData.nombre_activofijo}
                             onChange={handleChange}
-                            className="w-full border rounded-md p-2 focus:outline-none focus:ring focus:ring-green-300"
+                            className="w-full border rounded-lg p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
                         />
                     </div>
                     <div className="flex flex-col items-center text-center">
@@ -277,7 +267,7 @@ function CambioCrearActivo() {
                             name="ubicacion_interna"
                             value={formData.ubicacion_interna}
                             onChange={handleChange}
-                            className="w-full border rounded-md p-2 focus:outline-none focus:ring focus:ring-green-300"
+                            className="w-full border rounded-lg p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
                         />
                     </div>
                     <div className="flex flex-col items-center text-center">
@@ -287,33 +277,50 @@ function CambioCrearActivo() {
                             name="descripcion"
                             value={formData.descripcion}
                             onChange={handleChange}
-                            className="w-full border rounded-md p-2 focus:outline-none focus:ring focus:ring-green-300"
+                            className="w-full border rounded-lg p-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
                         />
                     </div>
-                    <div className="flex flex-col items-center text-left col-span-2">
-                        <label className="mb-2 text-center w-full">Pedimentos</label>
-                        <div className="w-full h-40 overflow-y-auto border rounded-md p-2">
-                            {pedimentos.map((pedimento) => (
-                                <label key={pedimento.id} className="flex items-center space-x-2 mb-1">
-                                <input
-                                type="checkbox"
-                                value={pedimento.no_pedimento}
-                                checked={formData.pedimentosSeleccionados.includes(pedimento.no_pedimento)}
-                                onChange={(e) => togglePedimentoSeleccionado(e.target.value)}
-                                
 
-                                />
-                                    <span>{pedimento.no_pedimento}</span>
+                    <div className="flex flex-col items-center text-left col-span-2">
+                        <label className="mb-2 text-center w-full font-semibold">
+                            Pedimento
+                        </label>
+
+                        <div className="w-full h-40 overflow-y-auto border rounded-md p-3 bg-gray-50">
+                            {pedimentos.map((pedimento) => (
+                                <label
+                                    key={pedimento.no_pedimento}
+                                    className="flex items-center space-x-2 mb-2 hover:bg-gray-100 p-1 rounded cursor-pointer"
+                                >
+                                    <input
+                                        type="radio"
+                                        name="pedimento"
+                                        value={pedimento.no_pedimento}
+                                        checked={
+                                            formData.pedimentoSeleccionado === pedimento.no_pedimento
+                                        }
+                                        onChange={(e) =>
+                                            setFormData((prev) => ({
+                                                ...prev,
+                                                pedimentoSeleccionado: e.target.value,
+                                            }))
+                                        }
+                                    />
+                                    <span className="text-sm">{pedimento.no_pedimento}</span>
                                 </label>
                             ))}
                         </div>
-                        <small className="text-gray-500 mt-1">Selecciona uno o más pedimentos</small>
+
+                        <small className="text-gray-500 mt-1">
+                            Selecciona un solo pedimento
+                        </small>
                     </div>
 
                     <div className="flex flex-col items-center text-center p-8 col-span-1">
                         <button
                             type="submit"
                             className="btn-agregar"
+                            disabled={!formData.pedimentoSeleccionado}
                         >
                             Agregar
                         </button>

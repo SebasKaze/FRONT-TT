@@ -203,7 +203,7 @@ function Productos() {
                     <table className="w-full border border-gray-300 shadow-lg bg-white">
                         <thead className="bg-gray-200">
                             <tr>
-                                <th className="border p-2">ID</th>
+                                <th className="border p-2">ID/No. Parte</th>
                                 <th className="border p-2">Nombre</th>
                                 <th className="border p-2">Fracción</th>
                                 <th className="border p-2">Subd</th>
@@ -220,7 +220,7 @@ function Productos() {
                                     <td className="border p-2">{editingRowId === row.id_producto_interno ? <input type="text" value={editedData.fraccion_arancelaria || ""} onChange={(e) => handleChange(e, "fraccion_arancelaria")} className="border p-1" /> : row.fraccion_arancelaria}</td>
                                     <td className="border p-2">{editingRowId === row.id_producto_interno ? <input type="text" value={editedData.subd || ""} onChange={(e) => handleChange(e, "subd")} className="border p-1" /> : row.subd}</td>
                                     <td className="border p-2">{editingRowId === row.id_producto_interno ? <input type="text" value={editedData.descripcion_fraccion || ""} onChange={(e) => handleChange(e, "descripcion_fraccion")} className="border p-1" /> : row.descripcion}</td>
-                                    <td className="border p-2">{editingRowId === row.id_producto_interno ? <input type="text" value={editedData.unidad_medida || ""} onChange={(e) => handleChange(e, "unidad_medida")} className="border p-1" /> : row.id_unidad}</td>
+                                    <td className="border p-2">{editingRowId === row.id_producto_interno ? <input type="text" value={editedData.unidadmedida || ""} onChange={(e) => handleChange(e, "unidad_medida")} className="border p-1" /> : row.unidadmedida}</td>
                                     <td className="border p-2 flex justify-center gap-2">
                                         {editingRowId === row.id_producto_interno ? (
                                             <>
@@ -256,8 +256,9 @@ function Productos() {
                         <table className="w-full border border-gray-300">
                             <thead>
                                 <tr className="bg-gray-200">
-                                    <th className="border p-2">ID</th>
+                                    <th className="border p-2">ID/No.Parte</th>
                                     <th className="border p-2">Cantidad</th>
+                                    <th className="border p-2">Merma</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -265,6 +266,7 @@ function Productos() {
                                     <tr key={index}>
                                         <td className="border p-2 font-bold">{item.id_material_interno}</td>
                                         <td className="border p-2">{item.cantidad}</td>
+                                        <td className="border p-2">{item.merma_por}%</td>
                                     </tr>
                                 ))}
                             </tbody>

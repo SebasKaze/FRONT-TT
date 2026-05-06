@@ -5,6 +5,7 @@ function DatosGe() {
     const userData = JSON.parse(localStorage.getItem("user")); // Obtener datos de usuario desde localStorage
     const [userInfo, setUserInfo] = useState(null);
     const [empresaInfo, setEmpresaInfo] = useState(null);
+    
 
     useEffect(() => {
         if (!userData || !userData.id_usuario || !userData.id_empresa) {
@@ -59,30 +60,89 @@ function DatosGe() {
             .catch((error) => console.error("Error al obtener información de la empresa:", error));
     }, []);
 
+    const handleGuardar = async () => {
+        try {
+            const response = await fetch(`${backConection}/api/datosGenerales/actualizarUsuario`, {
+                method: "POST", // o POST dependiendo tu backend
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    id_usuario: userData.id_usuario,
+                    nombre: userInfo.nombre,
+                    telefono: userInfo.telefono,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("Datos actualizados correctamente");
+            } else {
+                alert(data.message || "Error al actualizar");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Error en la conexión");
+        }
+    };
+
     return (
-        <div className="main-container">
+        <div className="max-w-6xl mx-auto bg-gray-100 p-5 rounded-xl">
             <h2 className="text-2xl font-bold mb-4">Datos Generales</h2>
 
             {/* Tabla de Usuario */}
             {userInfo && (
                 <div className="mb-6">
                     <h3 className="text-lg font-semibold mb-2">Información del Usuario</h3>
-                    <table className="table-auto border-collapse border border-gray-400 w-full">
-                        <thead>
-                            <tr className="bg-gray-200">
-                                <th className="border px-4 py-2">Nombre</th>
-                                <th className="border px-4 py-2">Correo</th>
-                                <th className="border px-4 py-2">Teléfono</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td className="border px-4 py-2">{userInfo.nombre}</td>
-                                <td className="border px-4 py-2">{userInfo.correo}</td>
-                                <td className="border px-4 py-2">{userInfo.telefono}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        
+                        {/* Nombre (editable) */}
+                        <div>
+                            <label className="block text-sm font-medium">Nombre</label>
+                            <input
+                                type="text"
+                                value={userInfo.nombre}
+                                onChange={(e) =>
+                                    setUserInfo({ ...userInfo, nombre: e.target.value })
+                                }
+                                className="w-full border p-2 rounded"
+                            />
+                        </div>
+
+                        {/* Correo (bloqueado) */}
+                        <div>
+                            <label className="block text-sm font-medium">Correo</label>
+                            <input
+                                type="email"
+                                value={userInfo.correo}
+                                disabled
+                                className="w-full border p-2 rounded bg-gray-200"
+                            />
+                        </div>
+
+                        {/* Teléfono (editable) */}
+                        <div>
+                            <label className="block text-sm font-medium">Teléfono</label>
+                            <input
+                                type="text"
+                                value={userInfo.telefono}
+                                onChange={(e) =>
+                                    setUserInfo({ ...userInfo, telefono: e.target.value })
+                                }
+                                className="w-full border p-2 rounded"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Botón guardar */}
+                    <button
+                        onClick={handleGuardar}
+                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+                    >
+                        Guardar Cambios
+                    </button>
                 </div>
             )}
 
