@@ -19,6 +19,15 @@ export default function Navbar() {
     const userData = JSON.parse(localStorage.getItem("user")) || {};
     const { cuenta } = userData;
 
+    const tiposCuenta = {
+        "1": "Administrador",
+        "2": "Encargado",
+        "3": "Capturista",
+        "4": "SAT",
+    };
+    const tipoUsuario = tiposCuenta[cuenta] || "Invitado";
+
+
 
 
     // Cerrar menú si se hace click fuera
@@ -55,14 +64,31 @@ export default function Navbar() {
                         src="https://imgur.com/Ir9JUQq.png"
                         alt="Logo"
                     />
-                    <div className="flex flex-col leading-tight">
+
+                <div className="flex flex-col leading-tight">
+                    <div className="flex items-center gap-2">
                         <span className="text-2xl font-bold text-white tracking-wide">
                             Anexo24
                         </span>
-                        <span className="text-xs text-orange-100">
-                            TT2
+
+                        <span className="
+                            text-xs 
+                            bg-white/20 
+                            text-white 
+                            px-2 py-1 
+                            rounded-full
+                            font-medium
+                            backdrop-blur-sm
+                        ">
+                            {tipoUsuario}
                         </span>
                     </div>
+
+                    <span className="text-xs text-orange-100">
+                        TT2
+                    </span>
+                </div>
+
                 </div>
 
                 {/* User Dropdown */}

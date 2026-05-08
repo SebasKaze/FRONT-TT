@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CiEdit } from "react-icons/ci";
-import { FaPlus, FaTrash } from "react-icons/fa";
+import { FaPlus, FaTrash, FaCheck, FaTimes } from "react-icons/fa";
 
 function Materiales() {
     const backConection = import.meta.env.VITE_BACK_URL;
@@ -115,10 +115,11 @@ function Materiales() {
         const updatedData = {
             ...editedData,
             id_domicilio: domicilioSeleccionado,
+            id_empresa: empresaSeleccionada,
         };
 
-        fetch(`${backConection}/api/editarMaterial/${id}`, {
-            method: "PUT",
+        fetch(`${backConection}/api/editarmaterial`, {
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -257,69 +258,87 @@ function Materiales() {
             </button>
 
             {/* TABLA */}
+
             {mostrarTabla && (
-                <div className="w-full p-4">
-                    <table className="w-full border border-gray-300 shadow-lg bg-white">
-                        <thead className="bg-gray-200">
+                <div className="w-full p-4 overflow-x-auto">
+                    <table className="w-full border border-gray-300 shadow-lg bg-white text-sm">
+                        <thead className="bg-gray-200 text-gray-700">
                             <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Fracción</th>
-                                <th>Subd</th>
-                                <th>Descripción</th>
-                                <th>Unidad</th>
-                                <th>Acciones</th>
+                                <th className="p-2 border">ID/No. Parte</th>
+                                <th className="p-2 border">Nombre</th>
+                                <th className="p-2 border">Fracción</th>
+                                <th className="p-2 border">Subd</th>
+                                <th className="p-2 border">Descripción</th>
+                                <th className="p-2 border">Unidad</th>
+                                <th className="p-2 border">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             {data.map((row) => (
-                                <tr
-                                    key={row.id_material_interno}
-                                    className="text-center"
-                                >
-                                    <td>{row.id_material_interno}</td>
-                                    <td>
-                                        {editingRowId ===
-                                        row.id_material_interno ? (
-                                            <input
-                                                value={
-                                                    editedData.nombre_interno ||
-                                                    ""
-                                                }
-                                                onChange={(e) =>
-                                                    handleChange(
-                                                        e,
-                                                        "nombre_interno"
-                                                    )
-                                                }
-                                            />
-                                        ) : (
-                                            row.nombre_interno
-                                        )}
-                                    </td>
+                                <tr key={row.id_material_interno} className="hover:bg-gray-50 transition-colors">
+                                    <td className="p-2 border text-center">{row.id_material_interno}</td>
+                                    
+                                    {/* Renderizado Condicional de Celdas */}
+                                    {[
+                                        { field: 'nombre_interno', label: 'Nombre' },
+                                        { field: 'fraccion_arancelaria', label: 'Fracción' }, // Este no será editable
+                                        { field: 'subd', label: 'Subd' },
+                                        { field: 'descripcion_fraccion', label: 'Descripción' },
+                                        { field: 'unidadmedida', label: 'Unidad' }
+                                    ].map((col) => (
+                                        <td key={col.field} className="p-1 border">
+                                            {/* CONDICIÓN: Si es la fila editando Y NO es el campo 'fraccion_arancelaria' */}
+                                            {editingRowId === row.id_material_interno && col.field !== 'fraccion_arancelaria' && col.field !== 'subd' ? (
+                                                <input
+                                                    className="w-full p-1 border rounded bg-blue-50 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                                                    value={editedData[col.field] || ""}
+                                                    onChange={(e) => handleChange(e, col.field)}
+                                                />
+                                            ) : (
+                                                // Si no se está editando, o es el campo bloqueado, se muestra el valor original
+                                                <span>{row[col.field]}</span>
+                                            )}
+                                        </td>
+                                    ))}
 
-                                    <td>{row.fraccion_arancelaria}</td>
-                                    <td>{row.subd}</td>
-                                    <td>{row.descripcion_fraccion}</td>
-                                    <td>{row.unidadmedida}</td>
-
-                                    <td className="flex gap-2 justify-center">
-                                        <button
-                                            onClick={() =>
-                                                handleEditClick(row)
-                                            }
-                                        >
-                                            <CiEdit />
-                                        </button>
-                                        <button
-                                            onClick={() =>
-                                                handleDeleteClick(
-                                                    row.id_material_interno
-                                                )
-                                            }
-                                        >
-                                            <FaTrash />
-                                        </button>
+                                    <td className="p-2 border text-center">
+                                        <div className="flex gap-3 justify-center items-center">
+                                            {editingRowId === row.id_material_interno ? (
+                                                <>
+                                                    <button 
+                                                        onClick={() => handleSaveClick(row.id_material_interno)}
+                                                        className="text-green-600 hover:text-green-800"
+                                                        title="Guardar"
+                                                    >
+                                                        <FaCheck size={18} />
+                                                    </button>
+                                                    <button 
+                                                        onClick={handleCancelClick}
+                                                        className="text-red-600 hover:text-red-800"
+                                                        title="Cancelar"
+                                                    >
+                                                        <FaTimes size={18} />
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleEditClick(row)}
+                                                        className="text-blue-600 hover:text-blue-800"
+                                                        title="Editar"
+                                                    >
+                                                        <CiEdit size={22} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteClick(row.id_material_interno)}
+                                                        className="text-red-500 hover:text-red-700"
+                                                        title="Eliminar"
+                                                    >
+                                                        <FaTrash size={16} />
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -327,6 +346,8 @@ function Materiales() {
                     </table>
                 </div>
             )}
+
+
         </div>
     );
 }
