@@ -11,6 +11,7 @@ export default function Pedimento() {
 
   const [empresaSeleccionada, setEmpresaSeleccionada] = useState("");
   const [domicilioSeleccionado, setDomicilioSeleccionado] = useState("");
+  const [tipoPedimento, setTipoPedimento] = useState("");
 
 
 
@@ -55,36 +56,65 @@ export default function Pedimento() {
           );
   }, [empresaSeleccionada, backConection]);
 
-    // =========================
-    // CAMBIO EMPRESA
-    // =========================
-    const handleEmpresaChange = (e) => {
-        const empresaId = e.target.value;
-        setEmpresaSeleccionada(empresaId);
-        setDomicilioSeleccionado("");
-        setData([]);
-    };
+  // =========================
+  // CAMBIO EMPRESA
+  // =========================
+  const handleEmpresaChange = (e) => {
+      const empresaId = e.target.value;
+      setEmpresaSeleccionada(empresaId);
+      setDomicilioSeleccionado("");
+      setTipoPedimento("");
+      setData([]);
+  };
 
-    // =========================
-    // CAMBIO DOMICILIO
-    // =========================
-    const handleDomicilioChange = (e) => {
-        setDomicilioSeleccionado(e.target.value);
-    };
+  // =========================
+  // CAMBIO DOMICILIO
+  // =========================
+  const handleDomicilioChange = (e) => {
+    setDomicilioSeleccionado(e.target.value);
+    setTipoPedimento("");
+    setData([]);
+  };
+  // =========================
+  // CAMBIO TIPO PEDIMENTO
+  // =========================
+  const handleTipoPedimentoChange = (e) => {
+    setTipoPedimento(e.target.value);
+  };
 
 
   useEffect(() => {
-    if (!empresaSeleccionada || !domicilioSeleccionado) return;
-    let url = `${backConection}/api/verpedimento`;
-    if (empresaSeleccionada && domicilioSeleccionado) {
-      url += `?id_empresa=${empresaSeleccionada}&id_domicilio=${domicilioSeleccionado}`;
-    }
 
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => setData(data))
-      .catch((error) => console.error("Error al obtener los datos:", error));
-  }, [empresaSeleccionada,domicilioSeleccionado]);
+      // No consultar hasta tener los 3 valores
+      if (
+          !empresaSeleccionada ||
+          !domicilioSeleccionado ||
+          !tipoPedimento
+      ) {
+          return;
+      }
+
+      let url = `${backConection}/api/verpedimento`;
+
+      url += `?id_empresa=${empresaSeleccionada}`;
+      url += `&id_domicilio=${domicilioSeleccionado}`;
+      url += `&tipo_pedimento=${tipoPedimento}`;
+
+      fetch(url)
+          .then((response) => response.json())
+          .then((data) => setData(data))
+          .catch((error) =>
+              console.error("Error al obtener los datos:", error)
+          );
+
+  }, [
+      empresaSeleccionada,
+      domicilioSeleccionado,
+      tipoPedimento,
+      backConection
+  ]);
+
+
 
   const handleEdit = (no_pedimento) => {
     navigate(`/pedimentos/editar/${no_pedimento}`);
@@ -95,13 +125,13 @@ export default function Pedimento() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto bg-gray-100 p-5 rounded-xl">
+    <div class="contenedor_prin">
       <div>
           <h1 className="text-2xl font-bold mb-4">
-              Selecciona una Empresa y Domicilio
+              Selecciona una Empresa, Domicilio y un tipo de Pedimento
           </h1>
 
-          <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-3 gap-4 mb-6">
               <div>
                   <label className="block mb-2 font-semibold">
                       Empresa
@@ -151,6 +181,27 @@ export default function Pedimento() {
                       ))}
                   </select>
               </div>
+
+              <div>
+                  <label className="block mb-2 font-semibold">
+                      Tipo de Pedimento
+                  </label>
+
+                  <select
+                      value={tipoPedimento}
+                      onChange={handleTipoPedimentoChange}
+                      disabled={!domicilioSeleccionado}
+                      className="w-full border rounded-md p-2 disabled:bg-gray-200"
+                  >
+                      <option value="">-- Seleccionar Tipo --</option>
+                      <option value="1">Sin utilizar</option>
+                      <option value="2">En uso</option>
+                      <option value="3">Completados</option>
+                      <option value="4">Todos</option>
+                  </select>
+              </div>
+
+        
           </div>
       </div>
       <h1 className="text-3xl font-bold mb-8 text-[#3b2f2f]">
@@ -160,10 +211,11 @@ export default function Pedimento() {
         <table className="w-full text-sm">
           <thead style={{ backgroundColor: "#f5e8c6" }}>
             <tr className="text-[#3b2f2f] text-left">
-              <th className="p-4">Número</th>
+              <th className="p-4">Número Pedimento</th>
+              <th className="p-4">Tipo Operación</th>
+              <th className="p-4">Clave Pedimento</th>
               <th className="p-4">Patente</th>
-              <th className="p-4">Fecha entrada</th>
-              <th className="p-4">Documentos</th>
+              <th className="p-4">Fecha</th>
               <th className="p-4">Estatus</th>
               <th className="p-4 text-center">Acciones</th>
             </tr>
@@ -171,26 +223,39 @@ export default function Pedimento() {
 
           <tbody>
             {data.map((row) => {
+
+              // =========================
+              // CALCULO DE DIAS
+              // =========================
               const fechaEnDate = new Date(row.fecha_en);
               const hoy = new Date();
-              const fechaLimite = new Date(fechaEnDate);
-              fechaLimite.setDate(fechaEnDate.getDate() + 180);
 
-              const diferenciaDias = Math.ceil(
-                (fechaLimite - hoy) / (1000 * 60 * 60 * 24)
+              const diferenciaMs = hoy - fechaEnDate;
+
+              const diasTranscurridos = Math.floor(
+                diferenciaMs / (1000 * 60 * 60 * 24)
               );
 
-              let estatus = diferenciaDias > 0
-                ? `Faltan ${diferenciaDias} días`
-                : `Vencido hace ${Math.abs(diferenciaDias)} días`;
+              // =========================
+              // ESTATUS
+              // =========================
+              let estatus = "";
+              let badgeColor = "";
 
-              let badgeColor =
-                Math.abs(diferenciaDias) <= 30
-                  ? "bg-green-500 text-white"
-                  : Math.abs(diferenciaDias) <= 90
-                  ? "bg-yellow-400 text-black"
-                  : "bg-red-600 text-white";
+              if (diasTranscurridos > 540) {
+                estatus = "Expirado";
+                badgeColor = "bg-red-600 text-white";
+              } else if (diasTranscurridos >= 500) {
+                estatus = "Próximo a vencer";
+                badgeColor = "bg-yellow-400 text-black";
+              } else {
+                estatus = "En tiempo";
+                badgeColor = "bg-green-600 text-white";
+              }
 
+              // =========================
+              // PATENTE
+              // =========================
               const patente = row.no_pedimento?.substring(4, 8);
 
               return (
@@ -198,30 +263,44 @@ export default function Pedimento() {
                   key={row.no_pedimento}
                   className="border-t hover:bg-[#fff7ef] transition-all duration-200"
                 >
+                  {/* NUMERO PEDIMENTO */}
                   <td className="p-4 font-medium text-[#3b2f2f]">
                     {row.no_pedimento}
                   </td>
 
+                  {/* TIPO OPERACION */}
+                  <td className="p-4 text-[#5a3e2b]">
+                    {row.tipo_oper}
+                  </td>
+
+                  {/* CLAVE PEDIMENTO */}
+                  <td className="p-4 text-[#5a3e2b]">
+                    {row.clave_ped}
+                  </td>
+
+                  {/* PATENTE */}
                   <td className="p-4 text-[#5a3e2b]">
                     {patente}
                   </td>
 
+                  {/* FECHA */}
                   <td className="p-4 text-[#5a3e2b]">
                     {row.fecha_en}
                   </td>
 
-                  <td className="p-4 text-[#5a3e2b]">
-                    Sin documentos
-                  </td>
-
+                  {/* ESTATUS */}
                   <td className="p-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${badgeColor}`}>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${badgeColor}`}
+                    >
                       {estatus}
                     </span>
                   </td>
 
+                  {/* ACCIONES */}
                   <td className="p-4">
                     <div className="flex justify-center gap-4">
+
                       {(userData?.tipo_de_cuenta !== 3 &&
                         userData?.tipo_de_cuenta !== 4) && (
                         <button
@@ -238,6 +317,7 @@ export default function Pedimento() {
                       >
                         <FaEye />
                       </button>
+
                     </div>
                   </td>
                 </tr>
@@ -245,7 +325,6 @@ export default function Pedimento() {
             })}
           </tbody>
         </table>
-
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import "../../../pedimento.css"; 
+
 
 function VerPedimento() {
     const { id } = useParams(); // Obtenemos el no_pedimento de la URL

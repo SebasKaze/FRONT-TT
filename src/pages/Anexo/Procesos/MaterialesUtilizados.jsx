@@ -151,22 +151,21 @@ function MaterialesUtilizados() {
 
 
     return (
-        <div className="max-w-6xl mx-auto bg-gray-100 p-5 rounded-xl">
-            <div>
-                <h1 className="text-2xl font-bold mb-4">
+        <div className="min-h-screen bg-[#faf7f2] p-6 rounded-xl">
+            <div className="max-w-7xl mx-auto">
+                <h1 className="text-3xl font-light text-[#3b2f2f] mb-8 tracking-wide border-b border-[#e2d5ca] pb-2">
                     Selecciona una Empresa y Domicilio
                 </h1>
-
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div>
-                        <label className="block mb-2 font-semibold">
+                        <label className="block text-sm font-medium text-[#5a4a3a] mb-1">
                             Empresa
                         </label>
                         <select
                             value={empresaSeleccionada}
                             onChange={handleEmpresaChange}
                             disabled={cuenta === "2"}
-                            className="w-full border rounded-md p-2 disabled:bg-gray-200"
+                            className="w-full appearance-none bg-white border border-[#d9cdc0] rounded-md px-4 py-2 text-[#3b2f2f] text-sm focus:outline-none focus:ring-1 focus:ring-[#b2906e] focus:border-[#b2906e] disabled:bg-gray-50 disabled:text-gray-500 transition-all"
                         >
                             <option value="">-- Seleccionar Empresa --</option>
                             {empresas
@@ -187,14 +186,14 @@ function MaterialesUtilizados() {
                     </div>
 
                     <div>
-                        <label className="block mb-2 font-semibold">
+                        <label className="block text-sm font-medium text-[#5a4a3a] mb-1">
                             Domicilio
                         </label>
                         <select
                             value={domicilioSeleccionado}
                             onChange={handleDomicilioChange}
                             disabled={!empresaSeleccionada}
-                            className="w-full border rounded-md p-2 disabled:bg-gray-200"
+                            className="w-full appearance-none bg-white border border-[#d9cdc0] rounded-md px-4 py-2 text-[#3b2f2f] text-sm focus:outline-none focus:ring-1 focus:ring-[#b2906e] focus:border-[#b2906e] disabled:bg-gray-50 disabled:text-gray-500 transition-all"
                         >
                             <option value="">-- Seleccionar Domicilio --</option>
                             {domicilios.map((domi) => (
@@ -208,62 +207,65 @@ function MaterialesUtilizados() {
                         </select>
                     </div>
                 </div>
+                <div className="bg-white rounded-lg border border-[#e8dfd6] shadow-sm overflow-hidden">
+                    <div className="px-6 py-4 border-b border-[#efe6dc] flex flex-wrap items-center justify-between gap-4">
+                        <h2 className="text-2xl font-light text-[#3b2f2f] tracking-wide">Materiales Utilizados</h2>
+                        <button
+                            onClick={() => setIsModalReporte(true)} 
+                            className="px-5 py-2 bg-[#a47148] text-white text-sm font-medium rounded-md hover:bg-[#8b5a3a] transition-colors shadow-sm">
+                            Generar Reporte
+                        </button>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead className="bg-[#f7f2eb] text-[#4a3a2a] font-medium">
+                                <tr>
+                                    <th className="px-4 py-3 text-center">Pedimento</th>
+                                    <th className="px-4 py-3 text-center">ID Interno</th>
+                                    <th className="px-4 py-3 text-center">Producto</th>
+                                    <th className="px-4 py-3 text-center">Fracción</th>
+                                    <th className="px-4 py-3 text-center">Sec</th>
+                                    <th className="px-4 py-3 text-center">Cantidad creada</th>
+                                    <th className="px-4 py-3 text-center">Fecha</th>
+                                    <th className="px-4 py-3 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {paginatedData.map((row, index) => (
+                                    <tr key={index} className="text-center">
+                                        <td className="px-4 py-3 font-medium text-[#3b2f2f] text-center">{row.no_pedimento}</td>
+                                        <td className="px-4 py-3  text-[#5a4a3a] text-center">{row.id_producto_interno}</td>
+                                        <td className="px-4 py-3  text-[#5a4a3a] text-center">{row.nombre_interno}</td>
+                                        <td className="px-4 py-3  text-[#5a4a3a] text-center">{row.fraccion_arancelaria}</td>
+                                        <td className="px-4 py-3  text-[#5a4a3a] text-center">{row.sec_partida}</td>
+                                        <td className="px-4 py-3  text-[#5a4a3a] text-center">{row.cantidad}</td>
+                                        <td className="px-4 py-3  text-[#5a4a3a] text-center">{row.fecha_transformacion}</td>
+                                        <td className="px-4 py-3 text-center">
+                                            <button
+                                                className="p-2 rounded-full text-[#a47148] hover:bg-[#f5ede4] hover:text-[#7a4e2e] transition-colors"
+                                                onClick={() =>
+                                                    materialUtilizadoVer(row.id_transformacion)
+                                                }
+                                            >
+                                                <FaEye />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+
+                        {modalOjo && (
+                            <Modal
+                                data={modalData}
+                                onClose={() => setIsModalOjo(false)}
+                            />
+                        )}
+                    </div>
+                </div>
             </div>
 
-            <div className="w-full mb-4">
-                <button
-                    onClick={() => setIsModalReporte(true)} 
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition">
-                    Generar Reporte
-                </button>
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 p-6">Materiales Utilizados</h2>
-            <div className="border border-gray-300 shadow-lg bg-white">
-                <table className="w-full">
-                    <thead className="bg-gray-200">
-                        <tr>
-                            <th className="border p-2">Pedimento</th>
-                            <th className="border p-2">ID Interno</th>
-                            <th className="border p-2">Producto</th>
-                            <th className="border p-2">Fracción</th>
-                            <th className="border p-2">Sec</th>
-                            <th className="border p-2">Cantidad creada</th>
-                            <th className="border p-2">Fecha</th>
-                            <th className="border p-2">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {paginatedData.map((row, index) => (
-                            <tr key={index} className="text-center">
-                                <td className="border p-2">{row.no_pedimento}</td>
-                                <td className="border p-2">{row.id_producto_interno}</td>
-                                <td className="border p-2">{row.nombre_interno}</td>
-                                <td className="border p-2">{row.fraccion_arancelaria}</td>
-                                <td className="border p-2">{row.sec_partida}</td>
-                                <td className="border p-2">{row.cantidad}</td>
-                                <td className="border p-2">{row.fecha_transformacion}</td>
-                                <td className="border p-2">
-                                    <button
-                                        className="text-blue-500 hover:text-blue-800"
-                                        onClick={() =>
-                                            materialUtilizadoVer(row.id_transformacion)
-                                        }
-                                    >
-                                        <FaEye />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
 
-                {modalOjo && (
-                    <Modal
-                        data={modalData}
-                        onClose={() => setIsModalOjo(false)}
-                    />
-                )}
-            </div>
 
 
             <div className="flex justify-center mt-4 gap-2">
@@ -325,7 +327,7 @@ function MaterialesUtilizados() {
 
 function Modal({ data = [], onClose }) {
     return (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+        <div className="fixed inset-0 bg-gray-900/50 flex justify-center items-center">
             <div className="bg-white p-6 rounded-lg shadow-lg w-[700px]">
                 <h2 className="text-xl font-bold mb-4">
                     Materiales utilizados
@@ -334,30 +336,30 @@ function Modal({ data = [], onClose }) {
                 <table className="w-full border border-gray-300">
                     <thead className="bg-gray-200">
                         <tr>
-                            <th className="border p-2">ID Interno</th>
-                            <th className="border p-2">Material</th>
-                            <th className="border p-2">Fracción</th>
-                            <th className="border p-2">Sub</th>
-                            <th className="border p-2">Cantidad</th>
+                            <th className="px-4 py-3 text-center">ID Interno</th>
+                            <th className="px-4 py-3 text-center">Material</th>
+                            <th className="px-4 py-3 text-center">Fracción</th>
+                            <th className="px-4 py-3 text-center">Sub</th>
+                            <th className="px-4 py-3 text-center">Cantidad</th>
                         </tr>
                     </thead>
                     <tbody>
                         {data.length > 0 ? (
                             data.map((item, index) => (
                                 <tr key={index} className="text-center">
-                                    <td className="border p-2">
+                                    <td className="px-4 py-3 text-center">
                                         {item.id_material_interno}
                                     </td>
-                                    <td className="border p-2">
+                                    <td className="px-4 py-3 text-center">
                                         {item.nombre_interno}
                                     </td>
-                                    <td className="border p-2">
+                                    <td className="px-4 py-3 text-center">
                                         {item.fraccion_arancelaria}
                                     </td>
-                                    <td className="border p-2">
+                                    <td className="px-4 py-3 text-center">
                                         {item.subd}
                                     </td>
-                                    <td className="border p-2">
+                                    <td className="px-4 py-3 text-center">
                                         {item.cantidad}
                                     </td>
                                 </tr>

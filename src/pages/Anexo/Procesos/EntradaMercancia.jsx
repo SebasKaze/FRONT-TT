@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate }  from "react-router-dom";
 import { FaEye } from "react-icons/fa6";
 
 export default function Pedimento() {
@@ -31,8 +31,6 @@ export default function Pedimento() {
             .then((response) => response.json())
             .then((data) => {
                 setEmpresas(data);
-
-                // Si cuenta = 2, fijar empresa automáticamente
                 if (cuenta === "2" && id_empresa) {
                     setEmpresaSeleccionada(id_empresa.toString());
                 }
@@ -101,34 +99,26 @@ export default function Pedimento() {
         window.open(`${backConection}/api/procesos/reporte/emercanciasE?id_empresa=${empresaSeleccionada}&id_domicilio=${domicilioSeleccionado}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`, "_blank");
     };
 
-    const descargarPDF = () => {
-        if (!fechaInicio || !fechaFin) {
-            alert("Por favor, selecciona un rango de fechas.");
-            return;
-        }
-        window.open(`${backConection}/api/procesos/reporte/emercanciasP?id_empresa=${id_empresa}&id_domicilio=${id_domicilio}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`, "_blank");
-    };
-
     const fetchFracciones =  (pedimento) => {
         navigate(`/pedimentos/ver/${pedimento}`);
     };
+
     return (
-        <div className="max-w-6xl mx-auto bg-gray-100 p-5 rounded-xl">
-            <div>
-                <h1 className="text-2xl font-bold mb-4">
+        <div className="min-h-screen bg-[#faf7f2] p-6 rounded-xl">
+            <div className="max-w-7xl mx-auto">
+                <h1 className="text-3xl font-light text-[#3b2f2f] mb-8 tracking-wide border-b border-[#e2d5ca] pb-2">
                     Selecciona una Empresa y Domicilio
                 </h1>
-
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div>
-                        <label className="block mb-2 font-semibold">
+                        <label className="block text-sm font-medium text-[#5a4a3a] mb-1">
                             Empresa
                         </label>
                         <select
                             value={empresaSeleccionada}
                             onChange={handleEmpresaChange}
                             disabled={cuenta === "2"}
-                            className="w-full border rounded-md p-2 disabled:bg-gray-200"
+                            className="w-full appearance-none bg-white border border-[#d9cdc0] rounded-md px-4 py-2 text-[#3b2f2f] text-sm focus:outline-none focus:ring-1 focus:ring-[#b2906e] focus:border-[#b2906e] disabled:bg-gray-50 disabled:text-gray-500 transition-all"
                         >
                             <option value="">-- Seleccionar Empresa --</option>
                             {empresas
@@ -149,14 +139,14 @@ export default function Pedimento() {
                     </div>
 
                     <div>
-                        <label className="block mb-2 font-semibold">
+                        <label className="block text-sm font-medium text-[#5a4a3a] mb-1">
                             Domicilio
                         </label>
                         <select
                             value={domicilioSeleccionado}
                             onChange={handleDomicilioChange}
                             disabled={!empresaSeleccionada}
-                            className="w-full border rounded-md p-2 disabled:bg-gray-200"
+                            className="w-full appearance-none bg-white border border-[#d9cdc0] rounded-md px-4 py-2 text-[#3b2f2f] text-sm focus:outline-none focus:ring-1 focus:ring-[#b2906e] focus:border-[#b2906e] disabled:bg-gray-50 disabled:text-gray-500 transition-all"
                         >
                             <option value="">-- Seleccionar Domicilio --</option>
                             {domicilios.map((domi) => (
@@ -170,94 +160,133 @@ export default function Pedimento() {
                         </select>
                     </div>
                 </div>
-            </div>
 
-            <div className="w-full max-w-5xl p-4">
-                <h2 className="text-3xl font-bold text-gray-900 mb-6 p-6">Entrada de Mercancías</h2>
+                <div className="bg-white rounded-lg border border-[#e8dfd6] shadow-sm overflow-hidden">
+                    <div className="px-6 py-4 border-b border-[#efe6dc] flex flex-wrap items-center justify-between gap-4">
+                        <h2 className="text-2xl font-light text-[#3b2f2f] tracking-wide">
+                            Entrada de Mercancías
+                        </h2>
+                        <button
+                            onClick={() => setModalOpen(true)}
+                            className="px-5 py-2 bg-[#a47148] text-white text-sm font-medium rounded-md hover:bg-[#8b5a3a] transition-colors shadow-sm"
+                        >
+                            Generar Reporte
+                        </button>
+                    </div>
 
-                {/* Botón para abrir el modal */}
-                <div className="flex gap-4 mb-4">
-                    <button 
-                        onClick={() => setModalOpen(true)} 
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
-                    >
-                        Generar Reporte
-                    </button>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead className="bg-[#f7f2eb] text-[#4a3a2a] font-medium">
+                                <tr>
+                                    <th className="px-4 py-3 text-center">Pedimento</th>
+                                    <th className="px-4 py-3 text-center">Clave</th>
+                                    <th className="px-4 py-3 text-center">Fecha</th>
+                                    <th className="px-4 py-3 text-center">Régimen</th>
+                                    <th className="px-4 py-3 text-center">Destino</th>
+                                    <th className="px-4 py-3 text-center">T. Cambio</th>
+                                    <th className="px-4 py-3 text-center">Peso</th>
+                                    <th className="px-4 py-3 text-center">Aduana</th>
+                                    <th className="px-4 py-3 text-center">Valor USD</th>
+                                    <th className="px-4 py-3 text-center">Valor Aduana</th>
+                                    <th className="px-4 py-3 text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-[#f0e9e2]">
+                                {data.map((row, index) => (
+                                    <tr
+                                        key={row.no_pedimento}
+                                        className="hover:bg-[#fdfaf7] transition-colors"
+                                    >
+                                        <td className="px-4 py-3 font-medium text-[#3b2f2f] text-center">
+                                            {row.no_pedimento}
+                                        </td>
+                                        <td className="px-4 py-3 text-[#5a4a3a] text-center">
+                                            {row.clave_ped}
+                                        </td>
+                                        <td className="px-4 py-3 text-[#5a4a3a] text-center">
+                                            {row.fecha_en}
+                                        </td>
+                                        <td className="px-4 py-3 text-[#5a4a3a] text-center">
+                                            {row.regimen}
+                                        </td>
+                                        <td className="px-4 py-3 text-[#5a4a3a] text-center">
+                                            {row.des_ori}
+                                        </td>
+                                        <td className="px-4 py-3 text-[#5a4a3a] text-center">
+                                            {row.tipo_cambio}
+                                        </td>
+                                        <td className="px-4 py-3 text-[#5a4a3a] text-center">
+                                            {row.peso_bruto}
+                                        </td>
+                                        <td className="px-4 py-3 text-[#5a4a3a] text-center">
+                                            {row.aduana_e_s}
+                                        </td>
+                                        <td className="px-4 py-3 text-[#5a4a3a] text-center">
+                                            ${row.valor_dolares}
+                                        </td>
+                                        <td className="px-4 py-3 text-[#5a4a3a] text-center">
+                                            ${row.valor_aduana}
+                                        </td>
+                                        <td className="px-4 py-3 text-center">
+                                            <button
+                                                onClick={() => fetchFracciones(row.no_pedimento)}
+                                                className="p-2 rounded-full text-[#a47148] hover:bg-[#f5ede4] hover:text-[#7a4e2e] transition-colors"
+                                            >
+                                                <FaEye size={16} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                {/* Tabla de datos */}
-                <table className="w-full border border-gray-300 shadow-lg bg-white">
-                    <thead className="bg-gray-200">
-                        <tr>
-                            <th className="border p-2">Pedimento</th>
-                            <th className="border p-2">Clave de pedimento</th>
-                            <th className="border p-2">Fecha</th>
-                            <th className="border p-2"> </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data.map((row) => (
-                            <tr key={row.no_pedimento} className="text-center">
-                                <td className="border p-2">{row.no_pedimento}</td>
-                                <td className="border p-2">{row.clave_ped}</td>
-                                <td className="border p-2">{row.fecha_en}</td>
-                                <td className="border p-2 flex justify-center gap-2">
-                                <button 
-                                    className="text-blue-500 hover:text-blue-800"
-                                    onClick={() => fetchFracciones(row.no_pedimento)}>
-                                    <FaEye />
-                                </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
                 {modalOjo && <Modal data={modalData} onClose={() => setIsModalOjo(false)} />}
             </div>
 
-            {/* MODAL */}
+            {/* MODAL DE REPORTE */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                        <h2 className="text-xl font-semibold mb-4">Generar Reporte</h2>
-
-                        {/* Filtro de rango de fechas */}
-                        <label className="block text-gray-700">Fecha Inicio:</label>
-                        <input 
-                            type="date" 
-                            className="border p-2 w-full mt-2 rounded" 
-                            value={fechaInicio}
-                            onChange={(e) => setFechaInicio(e.target.value)}
-                        />
-
-                        <label className="block text-gray-700 mt-3">Fecha Fin:</label>
-                        <input 
-                            type="date" 
-                            className="border p-2 w-full mt-2 rounded" 
-                            value={fechaFin}
-                            onChange={(e) => setFechaFin(e.target.value)}
-                        />
-
-                        {/* Botones de exportación */}
-                        <div className="flex gap-4 mt-4">
-                            <button 
-                                onClick={descargarExcel} 
-                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 transition"
-                            >
-                                Exportar Excel
-                            </button>
-                            <button 
-                                onClick={descargarPDF} 
-                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700 transition"
-                            >
-                                Exportar PDF
-                            </button>
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+                        <h2 className="text-xl font-light text-[#3b2f2f] mb-4">Generar Reporte</h2>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-[#5a4a3a] mb-1">
+                                    Fecha Inicio
+                                </label>
+                                <input
+                                    type="date"
+                                    value={fechaInicio}
+                                    onChange={(e) => setFechaInicio(e.target.value)}
+                                    className="w-full border border-[#d9cdc0] rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#b2906e] focus:border-[#b2906e]"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-[#5a4a3a] mb-1">
+                                    Fecha Fin
+                                </label>
+                                <input
+                                    type="date"
+                                    value={fechaFin}
+                                    onChange={(e) => setFechaFin(e.target.value)}
+                                    className="w-full border border-[#d9cdc0] rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#b2906e] focus:border-[#b2906e]"
+                                />
+                            </div>
+                            <div className="flex gap-3 pt-2">
+                                <button
+                                    onClick={descargarExcel}
+                                    className="flex-1 bg-[#4a7c59] text-white py-2 rounded-md text-sm font-medium hover:bg-[#3d6448] transition-colors"
+                                >
+                                    Exportar Excel
+                                </button>
+                            </div>
                         </div>
 
-                        {/* Botón para cerrar */}
-                        <button 
-                            onClick={() => setModalOpen(false)} 
-                            className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700 transition w-full"
+                        <button
+                            onClick={() => setModalOpen(false)}
+                            className="mt-5 w-full border border-[#d9cdc0] text-[#5a4a3a] py-2 rounded-md text-sm hover:bg-gray-50 transition-colors"
                         >
                             Cerrar
                         </button>
@@ -266,43 +295,50 @@ export default function Pedimento() {
             )}
         </div>
     );
-    
 }
+
 function Modal({ data, onClose }) {
     return (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                <h2 className="text-xl font-bold mb-4">Fracciones del Pedimento</h2>
-                <table className="w-full border border-gray-300">
-                    <thead className="bg-gray-200">
-                        <tr>
-                            <th className="border p-2">Fracción</th>
-                            <th className="border p-2">Cantidad</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data.length > 0 ? (
-                            data.map((item, index) => (
-                                <tr key={index} className="text-center">
-                                    <td className="border p-2">{item.fraccion}</td>
-                                    <td className="border p-2">{item.cantidad_umt}</td>
-                                </tr>
-                            ))
-                        ) : (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg w-full max-w-lg">
+                <div className="px-6 py-4 border-b border-[#efe6dc]">
+                    <h2 className="text-lg font-medium text-[#3b2f2f]">Fracciones del Pedimento</h2>
+                </div>
+                <div className="p-6">
+                    <table className="w-full text-sm">
+                        <thead className="bg-[#f7f2eb] text-[#4a3a2a]">
                             <tr>
-                                <td colSpan="2" className="border p-2 text-center">No hay partidas para este pedimento</td>
+                                <th className="px-4 py-2 text-left font-medium">Fracción</th>
+                                <th className="px-4 py-2 text-left font-medium">Cantidad</th>
                             </tr>
-                        )}
-                    </tbody>
-                </table>
-                <button 
-                    className="btn-crud"
-                    onClick={onClose}
-                >
-                    Cerrar
-                </button>
+                        </thead>
+                        <tbody className="divide-y divide-[#f0e9e2]">
+                            {data && data.length > 0 ? (
+                                data.map((item, index) => (
+                                    <tr key={index}>
+                                        <td className="px-4 py-2 text-[#5a4a3a]">{item.fraccion}</td>
+                                        <td className="px-4 py-2 text-[#5a4a3a]">{item.cantidad_umt}</td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="2" className="px-4 py-6 text-center text-gray-500">
+                                        No hay partidas para este pedimento
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+                <div className="px-6 py-4 border-t border-[#efe6dc] flex justify-end">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 text-sm text-[#5a4a3a] hover:bg-gray-50 rounded-md transition-colors"
+                    >
+                        Cerrar
+                    </button>
+                </div>
             </div>
         </div>
     );
 }
-

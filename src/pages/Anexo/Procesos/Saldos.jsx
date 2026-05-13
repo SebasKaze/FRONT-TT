@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { FaEye } from "react-icons/fa6";
 import { Pie } from "react-chartjs-2";
 import {
     Chart as ChartJS,
@@ -179,23 +179,21 @@ const pieData = graficaData ? {
 
 
     return (
-        <div className="max-w-6xl mx-auto bg-gray-100 p-5 rounded-xl">
-
-            <div>
-                <h1 className="text-2xl font-bold mb-4">
+        <div className="min-h-screen bg-[#faf7f2] p-6 rounded-xl">
+            <div className="max-w-7xl mx-auto">
+                <h1 className="text-3xl font-light text-[#3b2f2f] mb-8 tracking-wide border-b border-[#e2d5ca] pb-2">
                     Selecciona una Empresa y Domicilio
                 </h1>
-
                 <div className="grid grid-cols-2 gap-4 mb-6">
                     <div>
-                        <label className="block mb-2 font-semibold">
+                        <label className="block text-sm font-medium text-[#5a4a3a] mb-1">
                             Empresa
                         </label>
                         <select
                             value={empresaSeleccionada}
                             onChange={handleEmpresaChange}
                             disabled={cuenta === "2"}
-                            className="w-full border rounded-md p-2 disabled:bg-gray-200"
+                            className="w-full appearance-none bg-white border border-[#d9cdc0] rounded-md px-4 py-2 text-[#3b2f2f] text-sm focus:outline-none focus:ring-1 focus:ring-[#b2906e] focus:border-[#b2906e] disabled:bg-gray-50 disabled:text-gray-500 transition-all"
                         >
                             <option value="">-- Seleccionar Empresa --</option>
                             {empresas
@@ -216,14 +214,14 @@ const pieData = graficaData ? {
                     </div>
 
                     <div>
-                        <label className="block mb-2 font-semibold">
+                        <label className="block text-sm font-medium text-[#5a4a3a] mb-1">
                             Domicilio
                         </label>
                         <select
                             value={domicilioSeleccionado}
                             onChange={handleDomicilioChange}
                             disabled={!empresaSeleccionada}
-                            className="w-full border rounded-md p-2 disabled:bg-gray-200"
+                            className="w-full appearance-none bg-white border border-[#d9cdc0] rounded-md px-4 py-2 text-[#3b2f2f] text-sm focus:outline-none focus:ring-1 focus:ring-[#b2906e] focus:border-[#b2906e] disabled:bg-gray-50 disabled:text-gray-500 transition-all"
                         >
                             <option value="">-- Seleccionar Domicilio --</option>
                             {domicilios.map((domi) => (
@@ -240,98 +238,104 @@ const pieData = graficaData ? {
                 </div>
 
                 <div className="mb-6">
-                    <label className="block mb-2 font-semibold">Tipo de saldo</label>
+                    <label className="block text-sm font-medium text-[#5a4a3a] mb-1">Tipo de saldo</label>
                     <select
                         value={selector}
                         onChange={(e) => setSelector(e.target.value)}
-                        className="w-full border rounded-md p-2"
+                        className="w-full appearance-none bg-white border border-[#d9cdc0] rounded-md px-4 py-2 text-[#3b2f2f] text-sm focus:outline-none focus:ring-1 focus:ring-[#b2906e] focus:border-[#b2906e] disabled:bg-gray-50 disabled:text-gray-500 transition-all"
                     >
                         <option value="1">Sin utilizar</option>
                         <option value="2">Agotado</option>
                         <option value="3">Saldo restante</option>
                     </select>
                 </div>
+                <div className="bg-white rounded-lg border border-[#e8dfd6] shadow-sm overflow-hidden">
+                    <div className="px-6 py-4 border-b border-[#efe6dc] flex flex-wrap items-center justify-between gap-4">
+                        <h2 className="text-2xl font-light text-[#3b2f2f] tracking-wide">Saldo</h2>
+                        {/* Botón para abrir el modal */}
+                        <button 
+                            onClick={() => setIsModalReporte(true)} 
+                            className="px-5 py-2 bg-[#a47148] text-white text-sm font-medium rounded-md hover:bg-[#8b5a3a] transition-colors shadow-sm"
+                        >
+                            Generar Reporte
+                        </button>
+                        <input 
+                            type="text" 
+                            placeholder="Buscar por fracción..." 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="border  p-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        />
+                    </div>
 
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead className="bg-[#f7f2eb] text-[#4a3a2a] font-medium">
+                                <tr>
+                                    <th className="px-4 py-3 text-center">No. Pedimento</th>
+                                    <th className="px-4 py-3 text-center">Fracción</th>
+                                    <th className="px-4 py-3 text-center">
+                                        {selector === "1"
+                                            ? "Cantidad total"
+                                            : selector === "2"
+                                            ? "Estado"
+                                            : "Cantidad restante"}
+                                    </th>
+                                    {selector === "3" && (
+                                        <th className="px-4 py-3 text-center">Ver</th>
+                                    )}                            
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-[#f0e9e2]">
+                                {paginatedData.map((row, index) => (
+                                    <tr key={index} className="hover:bg-[#fdfaf7] transition-colors">
+                                        <td className="px-4 py-3  text-[#5a4a3a] text-center">{row.no_pedimento}</td>
+                                        <td className="px-4 py-3  text-[#5a4a3a] text-center">{row.fraccion}</td>
+                                        <td className="px-4 py-3  text-[#5a4a3a] text-center">
+                                            {selector === "1"
+                                                ? row.cantidad_total
+                                                : selector === "2"
+                                                ? "Agotado"
+                                                : row.cantidad_restante}
+                                        </td>
 
-
-
-            </div>
-
-            <h2 className="text-3xl font-bold text-gray-900 mb-6 p-6">Saldo</h2>
-            {/* Botón para abrir el modal */}
-            <div className="flex gap-4 mb-4">
-                <button 
-                    onClick={() => setIsModalReporte(true)} 
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
-                >
-                    Generar Reporte
-                </button>
-            </div>
-            <input 
-                type="text" 
-                placeholder="Buscar por fracción..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="border  p-2 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-            <div className="border border-gray-300 shadow-lg bg-white">
-                <table className="w-full">
-                    <thead className="bg-gray-200">
-                        <tr>
-                            <th className="border p-2">No. Pedimento</th>
-                            <th className="border p-2">Fracción</th>
-                            <th className="border p-2">
-                                {selector === "1"
-                                    ? "Cantidad total"
-                                    : selector === "2"
-                                    ? "Estado"
-                                    : "Cantidad restante"}
-                            </th>
-                            {selector === "3" && (
-                                <th className="border p-2">Ver</th>
-                            )}                            
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {paginatedData.map((row, index) => (
-                            <tr key={index} className="text-center">
-                                <td className="border p-2">{row.no_pedimento}</td>
-                                <td className="border p-2">{row.fraccion}</td>
-                                <td className="border p-2">
-                                    {selector === "1"
-                                        ? row.cantidad_total
-                                        : selector === "2"
-                                        ? "Agotado"
-                                        : row.cantidad_restante}
-                                </td>
-
-                                {selector === "3" && (
-                                    <td className="border p-2">
-                                        <button
-                                            onClick={() => verGrafica(row.no_pedimento)}
-                                            className="text-blue-600 hover:text-blue-800 text-xl"
-                                        >
-                                            👁️
-                                        </button>
-                                    </td>
-                                )}
-                            </tr>
+                                        {selector === "3" && (
+                                            <td className="px-4 py-3 text-center">
+                                                <button
+                                                    onClick={() => verGrafica(row.no_pedimento)}
+                                                    className="p-2 rounded-full text-[#a47148] hover:bg-[#f5ede4] hover:text-[#7a4e2e] transition-colors"
+                                                >
+                                                    <FaEye />
+                                                </button>
+                                            </td>
+                                        )}
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className="flex justify-center mt-4 gap-2">
+                        {Array.from({ length: totalPages }, (_, index) => (
+                            <button
+                                key={index + 1}
+                                className={`px-4 py-2 rounded-md shadow-md transition-all duration-300 ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
+                                onClick={() => setCurrentPage(index + 1)}
+                            >
+                                {index + 1}
+                            </button>
                         ))}
-                    </tbody>
-                </table>
+                    </div>
+
+
+
+                </div>
+
+
+
             </div>
 
-            <div className="flex justify-center mt-4 gap-2">
-                {Array.from({ length: totalPages }, (_, index) => (
-                    <button
-                        key={index + 1}
-                        className={`px-4 py-2 rounded-md shadow-md transition-all duration-300 ${currentPage === index + 1 ? 'bg-blue-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}`}
-                        onClick={() => setCurrentPage(index + 1)}
-                    >
-                        {index + 1}
-                    </button>
-                ))}
-            </div>
+
+
 
             {/* MODAL */}
             {modalReporte && (
